@@ -34,6 +34,8 @@ import com.crm.myapplication.ui.plans.PlansFragment;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -83,10 +85,11 @@ public class AddMemberFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-    private String arr[]=new String[(int) DataList.batchList
-            .stream().filter(m -> m.getStatus().equals("enable")).count()];
+    private List<Batch> enableList= DataList.batchList
+        .stream().filter(m -> m.getStatus().equals("enable")).collect(Collectors.toList());
     Batch p;
     Spinner spin;
+    private String arr[]=new String[enableList.size()];
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -94,7 +97,7 @@ public class AddMemberFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add_member, container, false);
         int k=0;
-        for(Batch b: DataList.batchList){
+        for(Batch b: enableList){
             if(b.getStatus().equals("enable")) {
                 arr[k] = b.getBatchname(); k++;
             }
@@ -285,7 +288,7 @@ public class AddMemberFragment extends Fragment {
                         arr[i],
                         Toast.LENGTH_LONG)
                         .show();
-                p= DataList.batchList.get(i);
+                p= enableList.get(i);
             }
 
             @Override
