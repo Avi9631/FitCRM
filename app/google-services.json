@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "591814136798",
+    "firebase_url": "https://fitcrm-9fad8-default-rtdb.firebaseio.com",
+    "project_id": "fitcrm-9fad8",
+    "storage_bucket": "fitcrm-9fad8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591814136798:android:c5bb8ad4509fce9b68434f",
+        "android_client_info": {
+          "package_name": "com.crm.fitcrm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "591814136798-9bg74r73fsjd0our326insnlvie1gmmi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXudvmml_9teO292UKCTLWaDmbOAizNZ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "591814136798-9bg74r73fsjd0our326insnlvie1gmmi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591814136798:android:b02f6090603be83268434f",
+        "android_client_info": {
+          "package_name": "com.crm.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "591814136798-9bg74r73fsjd0our326insnlvie1gmmi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXudvmml_9teO292UKCTLWaDmbOAizNZ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "591814136798-9bg74r73fsjd0our326insnlvie1gmmi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Home" />
+        <item
+            android:id="@+id/nav_addmember"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Add Member" />
+        <item
+            android:id="@+id/nav_batch"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Batch" />
+        <item
+            android:id="@+id/nav_plans"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Plans" />
+        <item
+            android:id="@+id/nav_viewmember"
+            android:icon="@mipmap/ic_launcher"
+            android:title="View Member" />
+
+    </group>
+
+
+</menu>
