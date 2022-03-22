@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.crm.myapplication.DataList;
 import com.crm.myapplication.MainActivity;
+import com.crm.myapplication.Models.Batch;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.Models.MemberFee;
 import com.crm.myapplication.Models.Plan;
@@ -36,7 +37,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class AdmissionActivity extends AppCompatActivity {
 
@@ -47,18 +50,18 @@ public class AdmissionActivity extends AppCompatActivity {
     private Button submit;
     private EditText admsnFee, discFee, tax;
 
-    private String arr[]=new String[(int) DataList.planList
-            .stream().filter(m -> m.getStatus().equals("enable")).count()];
+    private List<Plan> enableList= DataList.planList
+            .stream().filter(m -> m.getStatus().equals("enable")).collect(Collectors.toList());
     private Plan p=null;
+    private String arr[]=new String[enableList.size()];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admission);
 
-
         int k=0;
-        for(Plan b: DataList.planList){
+        for(Plan b: enableList){
             if(b.getStatus().equals("enable")) {
                 arr[k] = b.getPlanname(); k++;
             }
@@ -159,8 +162,8 @@ public class AdmissionActivity extends AppCompatActivity {
                         arr[i],
                         Toast.LENGTH_LONG)
                         .show();
-                p= DataList.planList.get(i);
-                c = Double.parseDouble(DataList.planList.get(i).getPlanfee());
+                p= enableList.get(i);
+                c = Double.parseDouble(enableList.get(i).getPlanfee());
                 setData(m);
             }
 

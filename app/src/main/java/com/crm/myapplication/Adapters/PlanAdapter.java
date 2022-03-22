@@ -59,7 +59,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.MyViewHolder> 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        TextView planname, fee, duration, desc;
+        TextView planname, fee, duration, desc, status;
         private Button deleteBtn, statusBtn;
 
         public MyViewHolder(View itemView) {
@@ -70,8 +70,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.MyViewHolder> 
             desc = itemView.findViewById(R.id.textView12);
             statusBtn= itemView.findViewById(R.id.button3);
             deleteBtn = itemView.findViewById(R.id.button14);
-
-
+            status= itemView.findViewById(R.id.textView28);
 
         }
 
@@ -81,6 +80,12 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.MyViewHolder> 
             this.fee.setText(planfee);
             this.duration.setText(planduration+" "+plandurationType);
             this.desc.setText(plandesc);
+            if(planStatus.equals("enable")){
+                this.status.setText("ACTIVE");
+            }else if( planStatus.equals("disable")){
+                this.status.setText("DISABLED");
+            }
+
             if(planStatus.equals("enable")){
                 statusBtn.setText("DISABLE");
             }else if( planStatus.equals("disable")){

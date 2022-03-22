@@ -58,7 +58,7 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.MyViewHolder
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        TextView planname, fee, duration, desc;
+        TextView planname, fee, duration, desc, status;
         private Button deleteBtn, statusBtn;
 
         public MyViewHolder(View itemView) {
@@ -69,6 +69,7 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.MyViewHolder
             desc = itemView.findViewById(R.id.textView12);
             statusBtn= itemView.findViewById(R.id.button3);
             deleteBtn = itemView.findViewById(R.id.button14);
+            status= itemView.findViewById(R.id.textView33);
 
         }
 
@@ -77,6 +78,12 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.MyViewHolder
             this.fee.setText(batchTot);
             this.duration.setText(batchTot+" / "+batchStrength);
             this.desc.setText(batchdesc);
+            if(batchStatus.equals("enable")){
+                this.status.setText("ACTIVE");
+            }else if( batchStatus.equals("disable")){
+                this.status.setText("DISABLED");
+            }
+
             if(batchStatus.equals("enable")){
                 statusBtn.setText("DISABLE");
             }else if( batchStatus.equals("disable")){
