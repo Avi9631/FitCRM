@@ -1,10 +1,12 @@
 package com.crm.myapplication.ui.batch;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -212,7 +214,7 @@ public class BatchFragment extends Fragment {
 
     }
 
-    public  static  void deletePlan(String id, int pos){
+    public  static  void deletePlan(String id, int pos , Context ctx){
         if(Integer.parseInt(DataList.batchList.get(pos).getBatchtot()) == 0) {
             FirebaseDatabase.getInstance().getReference()
                     .child("FITCRM")
@@ -225,9 +227,15 @@ public class BatchFragment extends Fragment {
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
                         loadBatchData();
+                        Toast.makeText(ctx, "Batch Deleted Successfully", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(ctx, "Error Occurred while deleting the Batch", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
+
+        }else{
+            Toast.makeText(ctx, "Batch has members allocated", Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -9,6 +9,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +22,7 @@ import com.crm.myapplication.ui.home.HomeFragment;
 import com.crm.myapplication.ui.plans.PlansFragment;
 import com.crm.myapplication.ui.slideshow.ViewMemberFragment;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 
 //github access token :- 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
@@ -104,6 +106,13 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_viewmember:
                 fragment = new ViewMemberFragment();
                 break;
+            case R.id.nav_signout:
+                FirebaseAuth.getInstance().signOut();
+                Intent i= new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(i);
+                finish();
+                break;
+
 
 //            case R.id.nav_menu3:
 //                fragment = new Menu3();

@@ -129,7 +129,7 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.MyViewHolder
                             new DialogInterface.OnClickListener() {
                                 @RequiresApi(api = Build.VERSION_CODES.O)
                                 public void onClick(DialogInterface dialog, int mid) {
-                                    BatchFragment.deletePlan(id, position);
+                                    BatchFragment.deletePlan(id, position, mContext);
                                     dialog.cancel();
                                 }
                             });
