@@ -229,6 +229,7 @@ public class PayFeeActivity extends AppCompatActivity {
                                                     String.valueOf(d),
                                                     String.valueOf(a),
                                                     String.valueOf(b),
+                                                    String.valueOf(f),
                                                     String.valueOf(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")))))
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override

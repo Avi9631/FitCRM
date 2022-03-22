@@ -9,9 +9,10 @@ public class MemberFee {
     private String discount;
     private String admission;
     private String tax;
+    private String fine;
     private String datetime;
 
-    public MemberFee(String id, String mid, String plan, String fee, String discount, String admission, String tax, String datetime) {
+    public MemberFee(String id, String mid, String plan, String fee, String discount, String admission, String tax, String fine, String datetime) {
         this.id = id;
         this.mid = mid;
         this.plan = plan;
@@ -19,6 +20,7 @@ public class MemberFee {
         this.discount = discount;
         this.admission = admission;
         this.tax = tax;
+        this.fine = fine;
         this.datetime = datetime;
     }
 
@@ -76,6 +78,14 @@ public class MemberFee {
 
     public void setTax(String tax) {
         this.tax = tax;
+    }
+
+    public String getFine() {
+        return fine;
+    }
+
+    public void setFine(String fine) {
+        this.fine = fine;
     }
 
     public String getDatetime() {

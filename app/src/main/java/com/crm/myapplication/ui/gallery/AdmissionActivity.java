@@ -234,6 +234,7 @@ public class AdmissionActivity extends AppCompatActivity {
                                                                 String.valueOf(d),
                                                                 String.valueOf(a),
                                                                 String.valueOf(b),
+                                                                String.valueOf(0),
                                                                 String.valueOf(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")))))
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
