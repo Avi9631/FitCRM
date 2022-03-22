@@ -1,7 +1,9 @@
 package com.crm.myapplication;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -9,7 +11,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -107,10 +111,31 @@ public class MainActivity extends AppCompatActivity
                 fragment = new ViewMemberFragment();
                 break;
             case R.id.nav_signout:
-                FirebaseAuth.getInstance().signOut();
-                Intent i= new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(i);
-                finish();
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+                builder1.setMessage("You want to Log out?");
+                builder1.setCancelable(true);
+                builder1.setPositiveButton(
+                        "Yes",
+                        new DialogInterface.OnClickListener() {
+                            @RequiresApi(api = Build.VERSION_CODES.O)
+                            public void onClick(DialogInterface dialog, int mid) {
+                                FirebaseAuth.getInstance().signOut();
+                                Intent i= new Intent(MainActivity.this, LoginActivity.class);
+                                startActivity(i);
+                                finish();
+                                dialog.cancel();
+                            }
+                        });
+                builder1.setNegativeButton(
+                        "No",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert11 = builder1.create();
+                alert11.show();
                 break;
 
 

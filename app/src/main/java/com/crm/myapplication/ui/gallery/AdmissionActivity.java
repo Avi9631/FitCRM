@@ -37,6 +37,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -311,10 +312,10 @@ public class AdmissionActivity extends AppCompatActivity {
             }else if(p.getPlandurationtype().equals("Day")){
                 l1= l.plusDays(Long.parseLong(p.getPlanduration()));
             }
-            String now= ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).getDayOfMonth()+"/"
-                    +ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).getMonthValue()+"/"
-                    +ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).getYear();
-            payScale.setText("Pay Scale: "+now+" To "+l1.getDayOfMonth()+"/"+l1.getMonthValue()+"/"+l1.getYear());
+
+            DateTimeFormatter ft= DateTimeFormatter.ofPattern("dd/MM/uuuu");
+
+            payScale.setText("Pay Scale: "+ft.format(l).toString()+" To "+ft.format(l1).toString());
         }
     }
 
