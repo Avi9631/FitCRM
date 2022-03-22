@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,11 +24,20 @@ import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.Models.MemberFee;
 import com.crm.myapplication.Models.Plan;
 import com.crm.myapplication.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class PayFeeActivity extends AppCompatActivity {
 
@@ -37,7 +47,10 @@ public class PayFeeActivity extends AppCompatActivity {
     private TextView name, payScale, admsnFeeTxt, feeTxt, taxTxt, tot, discText, fineTxt;
     private Button submit;
     private EditText admsnFee, discFee, tax, fine;
-    private String arr[]=new String[DataList.planList.size()];
+
+    private List<Plan> enableList= DataList.planList
+            .stream().filter(m -> m.getStatus().equals("enable")).collect(Collectors.toList());
+    private String arr[]=new String[enableList.size()];
     private Plan p=null;
     Member m=null;
 
@@ -48,10 +61,13 @@ public class PayFeeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pay_fee);
          m = (Member) getIntent().getSerializableExtra("member");
 
-        for(int i=0;i< DataList.planList.size(); i++){
-            arr[i] = DataList.planList.get(i).getPlanname();
-        }
 
+        int k=0;
+        for(Plan b: enableList){
+            if(b.getStatus().equals("enable")) {
+                arr[k] = b.getPlanname(); k++;
+            }
+        }
 
         name = findViewById(R.id.textView29);
         payScale = findViewById(R.id.textView30);
@@ -166,8 +182,8 @@ public class PayFeeActivity extends AppCompatActivity {
                         arr[i],
                         Toast.LENGTH_LONG)
                         .show();
-                p= DataList.planList.get(i);
-                c = Double.parseDouble(DataList.planList.get(i).getPlanfee());
+                p= enableList.get(i);
+                c = Double.parseDouble(enableList.get(i).getPlanfee());
                 setData();
             }
 
@@ -198,24 +214,54 @@ public class PayFeeActivity extends AppCompatActivity {
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
 
-                                    DataList.feeList.add(new MemberFee(UUID.randomUUID().toString(),
-                                            m.getId(),
-                                            p.getPlanname(),
-                                            p.getPlanfee(),
-                                            String.valueOf(d),
-                                            String.valueOf(a),
-                                            String.valueOf(b),
-                                            String.valueOf(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")))));
-                                    ZonedDateTime l= ZonedDateTime.parse(m.getExpdate());
-                                    ZonedDateTime l1 = null;
-                                    if(p.getPlandurationtype().equals("Month")){
-                                        l1= l.plusMonths(Long.parseLong(p.getPlanduration()));
-                                        DataList.memberList.get(getIntent().getIntExtra("position", -1)).setExpdate(l1.toString());
-                                    }else if(p.getPlandurationtype().equals("Day")){
-                                        l1= l.plusDays(Long.parseLong(p.getPlanduration()));
-                                        DataList.memberList.get(getIntent().getIntExtra("position", -1)).setExpdate(l1.toString());
-                                    }
-                                    DataList.memberList.get(getIntent().getIntExtra("position", -1)).setFeepaydate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+                                    FirebaseDatabase.getInstance().getReference()
+                                            .child("FITCRM")
+                                            .child("gyms")
+                                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                            .child("members")
+                                            .child(m.getId())
+                                            .child("fees")
+                                            .child(UUID.randomUUID().toString())
+                                            .setValue(new MemberFee(UUID.randomUUID().toString(),
+                                                    m.getId(),
+                                                    p.getPlanname(),
+                                                    p.getPlanfee(),
+                                                    String.valueOf(d),
+                                                    String.valueOf(a),
+                                                    String.valueOf(b),
+                                                    String.valueOf(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")))))
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    ZonedDateTime l= ZonedDateTime.parse(m.getExpdate());
+                                                    ZonedDateTime l1 = null;
+                                                    if(p.getPlandurationtype().equals("Month")){
+                                                        l1= l.plusMonths(Long.parseLong(p.getPlanduration()));
+                                                    }else if(p.getPlandurationtype().equals("Day")){
+                                                        l1= l.plusDays(Long.parseLong(p.getPlanduration()));
+                                                    }
+
+                                                    ZonedDateTime finalL = l1;
+                                                    FirebaseDatabase.getInstance().getReference()
+                                                            .child("FITCRM")
+                                                            .child("gyms")
+                                                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                            .child("members")
+                                                            .child(m.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                            snapshot.getRef().child("expdate").setValue(finalL);
+                                                            snapshot.getRef().child("feepaydate").setValue(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                                        }
+                                                    });
+                                                }
+                                            });
+
                                     Toast.makeText(PayFeeActivity.this, "Fee Paid "+m.getExpdate(), Toast.LENGTH_SHORT).show();
                                     finish();
                                 }
@@ -265,8 +311,3 @@ public class PayFeeActivity extends AppCompatActivity {
     }
 }
 
-
-//get vcs
-//url
-//install git
-//locate folder and git bash
