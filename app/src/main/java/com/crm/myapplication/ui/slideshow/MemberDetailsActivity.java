@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -89,18 +90,18 @@ public class MemberDetailsActivity extends AppCompatActivity {
                 });
 
 
-
-        name= findViewById(R.id.textView4);
-        id= findViewById(R.id.textView5);
-        picurl= findViewById(R.id.textView6);
-        docurl= findViewById(R.id.textView7);
-        joindate= findViewById(R.id.textView8);
-        expdate= findViewById(R.id.textView9);
-        mob= findViewById(R.id.textView10);
-        email= findViewById(R.id.textView11);
-        address= findViewById(R.id.textView12);
-        gender= findViewById(R.id.textView13);
-        dob= findViewById(R.id.textView14);
+//
+//        name= findViewById(R.id.textView4);
+//        id= findViewById(R.id.textView5);
+//        picurl= findViewById(R.id.textView6);
+//        docurl= findViewById(R.id.textView7);
+//        joindate= findViewById(R.id.textView8);
+//        expdate= findViewById(R.id.textView9);
+//        mob= findViewById(R.id.textView10);
+//        email= findViewById(R.id.textView11);
+//        address= findViewById(R.id.textView12);
+//        gender= findViewById(R.id.textView13);
+//        dob= findViewById(R.id.textView14);
 
         call= findViewById(R.id.button3);
         payFee= findViewById(R.id.button5);
@@ -124,25 +125,38 @@ public class MemberDetailsActivity extends AppCompatActivity {
         }else{
             block.setText("BLOCK");
         }
+//
+//        name.setText("Name : \n"+
+//                member.getName());
+//        id.setText("ID :  \n"+
+//                member.getId());
+//        ZonedDateTime z1= ZonedDateTime.parse(member.getJoindate());
+//        joindate.setText("Join Date :  \n"+ z1.getDayOfMonth() +"/"+z1.getMonthValue()+"/"+z1.getYear());
+//        ZonedDateTime z= ZonedDateTime.parse(DataList.memberList.get(getIntent().getIntExtra("position", -1)).getExpdate());
+//        expdate.setText("Exp Date :  \n"+ z.getDayOfMonth() +"/"+z.getMonthValue()+"/"+z.getYear());
+//        mob.setText("Mob :  \n"+
+//                member.getMob());
+//        email.setText("Email :  \n"+
+//                member.getEmail());
+//        address.setText("Address :  \n"+
+//                member.getAddress());
+//        gender.setText("Gender :  \n"+
+//                member.getGender());
+//        dob.setText("DOB :  \n"+
+//                member.getDob());
 
-        name.setText("Name : \n"+
-                member.getName());
-        id.setText("ID :  \n"+
-                member.getId());
-        ZonedDateTime z1= ZonedDateTime.parse(member.getJoindate());
-        joindate.setText("Join Date :  \n"+ z1.getDayOfMonth() +"/"+z1.getMonthValue()+"/"+z1.getYear());
-        ZonedDateTime z= ZonedDateTime.parse(DataList.memberList.get(getIntent().getIntExtra("position", -1)).getExpdate());
-        expdate.setText("Exp Date :  \n"+ z.getDayOfMonth() +"/"+z.getMonthValue()+"/"+z.getYear());
-        mob.setText("Mob :  \n"+
-                member.getMob());
-        email.setText("Email :  \n"+
-                member.getEmail());
-        address.setText("Address :  \n"+
-                member.getAddress());
-        gender.setText("Gender :  \n"+
-                member.getGender());
-        dob.setText("DOB :  \n"+
-                member.getDob());
+        String content = "<p>Name : " +
+                member.getName() +
+                "</p>"+
+                "<p>ID : " +
+                member.getId() +
+                "</p>"+
+                "<p>JoinDate : " +
+                member.getJoindate() +
+                "</p>"
+                ;
+        WebView wb= findViewById(R.id.webview);
+        wb.loadDataWithBaseURL(null, content, "text/html", "utf-8", null);
 
 
         call.setOnClickListener(new View.OnClickListener() {

@@ -251,7 +251,7 @@ public class PayFeeActivity extends AppCompatActivity {
                                                             .child(m.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
                                                         @Override
                                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                            snapshot.getRef().child("expdate").setValue(finalL);
+                                                            snapshot.getRef().child("expdate").setValue(finalL.toString());
                                                             snapshot.getRef().child("feepaydate").setValue(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
                                                         }
 
