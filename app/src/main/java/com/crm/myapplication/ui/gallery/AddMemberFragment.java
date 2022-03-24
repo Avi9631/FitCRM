@@ -21,6 +21,7 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
@@ -30,11 +31,18 @@ import com.crm.myapplication.Models.Batch;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.R;
 import com.crm.myapplication.ui.plans.PlansFragment;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -91,6 +99,9 @@ public class AddMemberFragment extends Fragment {
     Spinner spin;
     private String arr[]=new String[enableList.size()];
 
+
+    Uri uripro, uridoc;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -102,6 +113,8 @@ public class AddMemberFragment extends Fragment {
                 arr[k] = b.getBatchname(); k++;
             }
         }
+
+
         name = ((EditText) view.findViewById(R.id.editTextTextPersonName));
         mobile = ((EditText) view.findViewById(R.id.editTextTextPersonName2));
         email = ((EditText) view.findViewById(R.id.editTextTextPersonName3));
@@ -213,68 +226,75 @@ public class AddMemberFragment extends Fragment {
                 } else if (female.isChecked()) {
                     gender = "Female";
                 }
-                if (gender.equals("Male") || gender.equals("Female")) {
-                    if (!((name.getText().toString()).equals("")) &&
-                            !((mobile.getText().toString()).equals("")) && mobile.length() == 10) {
-                        if (joindate.getText().toString().equals("") ||
-                                verifyDate(joindate.getText().toString())) {
-                            if (dob.getText().toString().equals("") ||
-                                    verifyDate(dob.getText().toString())) {
-                                if(Integer.parseInt(p.getBatchtot()) < Integer.parseInt(p.getBatchMaxStrength())) {
-                                    AlertDialog.Builder builder1 = new AlertDialog.Builder(getContext());
-                                    builder1.setMessage("Are you sure to add a member?");
-                                    builder1.setCancelable(true);
+                if(p != null) {
+                    if (gender.equals("Male") || gender.equals("Female")) {
+                        if (!((name.getText().toString()).equals("")) &&
+                                !((mobile.getText().toString()).equals("")) && mobile.length() == 10) {
+                            if (joindate.getText().toString().equals("") ||
+                                    verifyDate(joindate.getText().toString())) {
+                                if (dob.getText().toString().equals("") ||
+                                        verifyDate(dob.getText().toString())) {
+                                    if (Integer.parseInt(p.getBatchtot()) < Integer.parseInt(p.getBatchMaxStrength())) {
+                                        AlertDialog.Builder builder1 = new AlertDialog.Builder(getContext());
+                                        builder1.setMessage("Are you sure to add a member?");
+                                        builder1.setCancelable(true);
 
-                                    String finalGender = gender;
-                                    builder1.setPositiveButton(
-                                            "Yes",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
+                                        String finalGender = gender;
+                                        builder1.setPositiveButton(
+                                                "Yes",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
 
-                                                    Member m = new Member(name.getText().toString(),
-                                                            "",
-                                                            "", "",
-                                                            (joindate.getText().toString()).equals("") ? ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toString() : joindate.getText().toString(),
-                                                            "", "", mobile.getText().toString(),
-                                                            email.getText().toString(),
-                                                            address.getText().toString(),
-                                                            finalGender, dob.getText().toString(),
-                                                            details.getText().toString(),
-                                                            "active",
-                                                            ((p == null) ? "" : p.getBatchid()),
-                                                            ((p == null) ? "" : p.getBatchname()));
-                                                    PlansFragment.loadPlanData();
-                                                    Intent i = new Intent(getContext(), AdmissionActivity.class);
-                                                    i.putExtra("member", m);
-                                                    startActivity(i);
-                                                    dialog.cancel();
-                                                }
-                                            });
+                                                        Member m = new Member(name.getText().toString(),
+                                                                "",
+                                                                "", "",
+                                                                (joindate.getText().toString()).equals("") ? ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toString() : joindate.getText().toString(),
+                                                                "", "", mobile.getText().toString(),
+                                                                email.getText().toString(),
+                                                                address.getText().toString(),
+                                                                finalGender, dob.getText().toString(),
+                                                                details.getText().toString(),
+                                                                "active",
+                                                                ((p == null) ? "" : p.getBatchid()),
+                                                                ((p == null) ? "" : p.getBatchname()));
 
-                                    builder1.setNegativeButton(
-                                            "No",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-                                                    dialog.cancel();
-                                                }
-                                            });
+                                                        PlansFragment.loadPlanData();
+                                                        Intent i = new Intent(getContext(), AdmissionActivity.class);
+                                                        i.putExtra("member", m);
+                                                        i.putExtra("uridoc", uridoc.toString());
+                                                        i.putExtra("uripro", uripro.toString());
+                                                        startActivity(i);
+                                                        dialog.cancel();
+                                                    }
+                                                });
 
-                                    AlertDialog alert11 = builder1.create();
-                                    alert11.show();
-                                }else {
-                                    Toast.makeText(getContext(), "This Batch is full", Toast.LENGTH_SHORT).show();
+                                        builder1.setNegativeButton(
+                                                "No",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        dialog.cancel();
+                                                    }
+                                                });
+
+                                        AlertDialog alert11 = builder1.create();
+                                        alert11.show();
+                                    } else {
+                                        Toast.makeText(getContext(), "This Batch is full", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Toast.makeText(getContext(), "Invalid DOB", Toast.LENGTH_SHORT).show();
                                 }
                             } else {
-                                Toast.makeText(getContext(), "Invalid DOB", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Invalid Join Date", Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            Toast.makeText(getContext(), "Invalid Join Date", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Invalid Data", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(getContext(), "Invalid Data", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Invalid Gender", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(getContext(), "Invalid Gender", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getContext(), "Please select a batch", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -332,6 +352,7 @@ public class AddMemberFragment extends Fragment {
                     // SELECT_PICTURE constant
                     if (requestCode == 0) {
                         // Get the url of the image from data
+                        uripro= data.getData();
                         Bitmap photo = (Bitmap) data.getExtras().get("data");
                         propic.setImageBitmap(photo);
                     }
@@ -343,10 +364,10 @@ public class AddMemberFragment extends Fragment {
                     // SELECT_PICTURE constant
                     if (requestCode == 200) {
                         // Get the url of the image from data
-                        Uri selectedImageUri1 = data.getData();
-                        if (null != selectedImageUri1) {
+                        uripro = data.getData();
+                        if (null != uripro) {
                             // update the preview image in the layout
-                            propic.setImageURI(selectedImageUri1);
+                            propic.setImageURI(uripro);
                         }
                     }
                 }
@@ -358,6 +379,7 @@ public class AddMemberFragment extends Fragment {
                     if (requestCode == 2) {
                         // Get the url of the image from data
                         Bitmap photo = (Bitmap) data.getExtras().get("data");
+                        uridoc= data.getData();
                         docs.setImageBitmap(photo);
                     }
                 }
@@ -368,10 +390,10 @@ public class AddMemberFragment extends Fragment {
                     // SELECT_PICTURE constant
                     if (requestCode == 200) {
                         // Get the url of the image from data
-                        Uri selectedImageUri2 = data.getData();
-                        if (null != selectedImageUri2) {
+                        uridoc = data.getData();
+                        if (null != uridoc) {
                             // update the preview image in the layout
-                            docs.setImageURI(selectedImageUri2);
+                            docs.setImageURI(uridoc);
                         }
                     }
                 }
@@ -392,4 +414,5 @@ public class AddMemberFragment extends Fragment {
             return false;
         }
     }
+
 }

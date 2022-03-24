@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +17,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.crm.myapplication.DataList;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.R;
@@ -45,6 +47,7 @@ public class MemberDetailsActivity extends AppCompatActivity {
     TextView gender;
     TextView dob;
     Member member=null;
+    ImageView v1, v2;
 
     Button call, payFee, msg, idCard, delete, block, edit , addDays;
 
@@ -53,6 +56,21 @@ public class MemberDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_member_details);
+
+        call= findViewById(R.id.button3);
+        payFee= findViewById(R.id.button5);
+        msg= findViewById(R.id.button4);
+        msg.setVisibility(View.GONE);
+        idCard= findViewById(R.id.button6);
+        edit= findViewById(R.id.button9);
+        block= findViewById(R.id.button10);
+        delete= findViewById(R.id.button11);
+        addDays= findViewById(R.id.button12);
+
+        v1= findViewById(R.id.imageView2);
+        v2= findViewById(R.id.imageView3);
+
+
         FirebaseDatabase.getInstance().getReference()
                 .child("FITCRM")
                 .child("gyms")
@@ -103,15 +121,6 @@ public class MemberDetailsActivity extends AppCompatActivity {
 //        gender= findViewById(R.id.textView13);
 //        dob= findViewById(R.id.textView14);
 
-        call= findViewById(R.id.button3);
-        payFee= findViewById(R.id.button5);
-        msg= findViewById(R.id.button4);
-        msg.setVisibility(View.GONE);
-        idCard= findViewById(R.id.button6);
-        edit= findViewById(R.id.button9);
-        block= findViewById(R.id.button10);
-        delete= findViewById(R.id.button11);
-        addDays= findViewById(R.id.button12);
 
 
     }
@@ -145,14 +154,58 @@ public class MemberDetailsActivity extends AppCompatActivity {
 //        dob.setText("DOB :  \n"+
 //                member.getDob());
 
-        String content = "<p>Name : " +
+        Glide.with(this).load(member.getPicurl()).into(v2);
+        Glide.with(this).load(member.getDocurl()).into(v2);
+
+        String content = "<p><b>Name : </b>" +
                 member.getName() +
                 "</p>"+
-                "<p>ID : " +
+                "<p><b>ID : </b>" +
                 member.getId() +
                 "</p>"+
-                "<p>JoinDate : " +
+                "<p><b>Join Date : </b>" +
                 member.getJoindate() +
+                "</p>"+
+                "</p>"+
+                "<p><b>Exp Date : </b>" +
+                member.getExpdate() +
+                "</p>"+
+                "</p>"+
+                "<p><b>Mobile : </b>" +
+                member.getMob() +
+                "</p>"+
+                "</p>"+
+                "<p><b>Email : </b>" +
+                member.getEmail() +
+                "</p>"+
+                "</p>"+
+                "<p><b>Address : </b>" +
+                member.getAddress() +
+                "</p>"+
+                "</p>"+
+                "<p><b>Gender : </b>" +
+                member.getGender() +
+                "</p>"+
+                "<p><b>DOB : </b>" +
+                member.getDob() +
+                "</p>"+
+                "<p><b>Batch : </b>" +
+                member.getBatchname()+
+                "</p>"+
+                "<p><b>Gender : </b>" +
+                member.getGender() +
+                "</p>"+
+                "<p><b>Last Fee Pay Date : </b>" +
+                member.getFeepaydate() +
+                "</p>"+
+                "<p><b>Member Details : </b>" +
+                member.getDetails() +
+                "</p>"+
+                "<p><b>Member Status : </b>" +
+                member.getStatus() +
+                "</p>"+
+        "<p><b>Member Image : </b>" +
+                member.getPicurl() +
                 "</p>"
                 ;
         WebView wb= findViewById(R.id.webview);

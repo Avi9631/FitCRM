@@ -2,6 +2,7 @@ package com.crm.myapplication.ui.gallery;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -22,18 +23,22 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.crm.myapplication.DataList;
 import com.crm.myapplication.MainActivity;
-import com.crm.myapplication.Models.Batch;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.Models.MemberFee;
 import com.crm.myapplication.Models.Plan;
 import com.crm.myapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -55,6 +60,9 @@ public class AdmissionActivity extends AppCompatActivity {
             .stream().filter(m -> m.getStatus().equals("enable")).collect(Collectors.toList());
     private Plan p=null;
     private String arr[]=new String[enableList.size()];
+    Uri uripro, uridoc;
+    FirebaseStorage storage;
+    StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +77,13 @@ public class AdmissionActivity extends AppCompatActivity {
         }
 
         Member m = (Member) getIntent().getSerializableExtra("member");
+        uripro = Uri.parse(getIntent().getStringExtra("uripro"));
+        uridoc = Uri.parse(getIntent().getStringExtra("uridoc"));
+        Toast.makeText(this, uripro.toString(), Toast.LENGTH_SHORT).show();
+
+        // get the Firebase  storage reference
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
 
         name = findViewById(R.id.textView29);
         payScale = findViewById(R.id.textView30);
@@ -208,70 +223,7 @@ public class AdmissionActivity extends AppCompatActivity {
 
                                     String mid= UUID.randomUUID().toString();
                                     m.setId(mid);
-                                    FirebaseDatabase.getInstance().getReference()
-                                            .child("FITCRM")
-                                            .child("gyms")
-                                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                            .child("members")
-                                            .child(mid)
-                                            .setValue(m).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful()){
-
-                                                FirebaseDatabase.getInstance().getReference()
-                                                        .child("FITCRM")
-                                                        .child("gyms")
-                                                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                                        .child("members")
-                                                        .child(mid)
-                                                        .child("fees")
-                                                        .child(UUID.randomUUID().toString())
-                                                        .setValue(new MemberFee(mid,
-                                                                m.getId(),
-                                                                p.getPlanname(),
-                                                                p.getPlanfee(),
-                                                                String.valueOf(d),
-                                                                String.valueOf(a),
-                                                                String.valueOf(b),
-                                                                String.valueOf(0),
-                                                                String.valueOf(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")))))
-                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
-                                                                if(task.isSuccessful()){
-
-                                                                    FirebaseDatabase.getInstance().getReference()
-                                                                            .child("FITCRM")
-                                                                            .child("gyms")
-                                                                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                                                            .child("batch")
-                                                                            .child(m.getBatch())
-                                                                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                                @Override
-                                                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                                                                                    int max= Integer.parseInt(snapshot.child("batchMaxStrength").getValue().toString());
-                                                                                    int curr= Integer.parseInt(snapshot.child("batchtot").getValue().toString());
-                                                                                    curr+=1;
-                                                                                    snapshot.getRef().child("batchtot").setValue(curr);
-                                                                                }
-
-                                                                                @Override
-                                                                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                                                                }
-                                                                            });
-
-                                                                    Toast.makeText(AdmissionActivity.this, "Member Added", Toast.LENGTH_SHORT).show();
-                                                                    Intent i=new Intent(AdmissionActivity.this, MainActivity.class);
-                                                                    startActivity(i);
-                                                                    finish();
-                                                                }
-                                                            }
-                                                        });
-                                            }
-                                        }
-                                    });
+                                   uploadImage(m);
 
 //                                    Intent i= new Intent(AdmissionActivity.this, MainActivity.class);
 //                                    startActivity(i);
@@ -317,6 +269,169 @@ public class AdmissionActivity extends AppCompatActivity {
             DateTimeFormatter ft= DateTimeFormatter.ofPattern("dd/MM/uuuu");
 
             payScale.setText("Pay Scale: "+ft.format(l).toString()+" To "+ft.format(l1).toString());
+        }
+    }
+
+
+    private void uploadData(Member m){
+        FirebaseDatabase.getInstance().getReference()
+                .child("FITCRM")
+                .child("gyms")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("members")
+                .child(m.getId())
+                .setValue(m).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()){
+
+                    FirebaseDatabase.getInstance().getReference()
+                            .child("FITCRM")
+                            .child("gyms")
+                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .child("members")
+                            .child(m.getId())
+                            .child("fees")
+                            .child(UUID.randomUUID().toString())
+                            .setValue(new MemberFee(m.getId(),
+                                    m.getId(),
+                                    p.getPlanname(),
+                                    p.getPlanfee(),
+                                    String.valueOf(d),
+                                    String.valueOf(a),
+                                    String.valueOf(b),
+                                    String.valueOf(0),
+                                    String.valueOf(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")))))
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(task.isSuccessful()){
+
+                                        FirebaseDatabase.getInstance().getReference()
+                                                .child("FITCRM")
+                                                .child("gyms")
+                                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                .child("batch")
+                                                .child(m.getBatch())
+                                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                                                                    int max= Integer.parseInt(snapshot.child("batchMaxStrength").getValue().toString());
+                                                        int curr= Integer.parseInt(snapshot.child("batchtot").getValue().toString());
+                                                        curr+=1;
+                                                        snapshot.getRef().child("batchtot").setValue(curr);
+                                                        Toast.makeText(AdmissionActivity.this, "Member Added", Toast.LENGTH_SHORT).show();
+                                                        Intent i=new Intent(AdmissionActivity.this, MainActivity.class);
+                                                        startActivity(i);
+                                                        finish();
+
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                                    }
+                                                });
+
+
+                                    }
+                                }
+                            });
+                }
+            }
+        });
+    }
+
+    private void uploadImage(Member m)
+    {
+        if (uripro != null) {
+            // Defining the child of storageReference
+            StorageReference ref
+                    = storageReference
+                    .child(
+                            "/"+FirebaseAuth.getInstance().getCurrentUser().getUid()+"/propics/"
+
+                                    + UUID.randomUUID().toString());
+            StorageReference ref1
+                    = storageReference
+                    .child(
+                            "/"+FirebaseAuth.getInstance().getCurrentUser().getUid()+"/docpics/"+ FirebaseAuth.getInstance().getCurrentUser().getUid()
+                                    + UUID.randomUUID().toString());
+
+            // adding listeners on upload
+            // or failure of image
+            ref.putFile(uripro)
+                    .addOnSuccessListener(
+                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+                                @Override
+                                public void onSuccess(
+                                        UploadTask.TaskSnapshot taskSnapshot)
+                                {
+                                             Toast.makeText(AdmissionActivity.this,
+                                            "Image Uploaded!!",
+                                            Toast.LENGTH_SHORT).show();
+
+                                    if(uridoc != null){
+                                        ref1.putFile(uridoc)
+                                                .addOnSuccessListener(
+                                                        new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                            @Override
+                                                            public void onSuccess(
+                                                                    UploadTask.TaskSnapshot taskSnapshot)
+                                                            {
+
+                                                                ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                                    @Override
+                                                                    public void onSuccess(Uri uri) {
+                                                                        m.setPicurl(uri.toString());
+                                                                        ref1.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                                            @Override
+                                                                            public void onSuccess(Uri uri) {
+                                                                                m.setDocurl(uri.toString());
+                                                                                uploadData(m);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                });
+                                                            }
+                                                        })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e)
+                                                    {
+
+                                                        // Error, Image not uploaded
+                                                        Toast.makeText(AdmissionActivity.this,
+                                                                "Failed " + e.getMessage(),
+                                                                Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                    }else{
+                                        ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {
+                                                m.setPicurl(uri.toString());uploadData(m);
+                                            }
+                                        });
+                                    }
+                                }
+                            })
+
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e)
+                        {
+
+                            // Error, Image not uploaded
+                            Toast
+                                    .makeText(AdmissionActivity.this,
+                                            "Failed " + e.getMessage(),
+                                            Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                    });
         }
     }
 
