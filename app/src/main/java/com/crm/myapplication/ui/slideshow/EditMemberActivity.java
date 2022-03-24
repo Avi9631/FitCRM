@@ -17,6 +17,7 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,8 +26,15 @@ import com.crm.myapplication.DataList;
 import com.crm.myapplication.Models.Batch;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.R;
+import com.crm.myapplication.ui.gallery.AdmissionActivity;
+import com.crm.myapplication.ui.plans.PlansFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -54,7 +62,10 @@ public class EditMemberActivity extends AppCompatActivity {
             }
         }
 
-        int pos = getIntent().getIntExtra("position", -1);
+
+        String id = getIntent().getStringExtra("id");
+        Member m = DataList.memberList.stream().filter(c -> c.getId().equals(id)).findAny().orElse(null);
+
 
         name = ((EditText) findViewById(R.id.editTextTextPersonName));
         mobile = ((EditText) findViewById(R.id.editTextTextPersonName2));
@@ -75,21 +86,31 @@ public class EditMemberActivity extends AppCompatActivity {
         submit = findViewById(R.id.button2);
 
 
-        name.setText(DataList.memberList.get(pos).getName());
-        mobile.setText(DataList.memberList.get(pos).getMob());
-        email.setText(DataList.memberList.get(pos).getEmail());
-        ZonedDateTime l= ZonedDateTime.parse(DataList.memberList.get(pos).getJoindate());
-        DateTimeFormatter ft= DateTimeFormatter.ofPattern("dd/MM/uuuu");
-        joindate.setText(ft.format(l).toString());
+        name.setText(m.getName());
+        mobile.setText(m.getMob());
+        email.setText(m.getEmail());
 
-        address.setText(DataList.memberList.get(pos).getAddress());
-        details.setText(DataList.memberList.get(pos).getDetails());
-        if(DataList.memberList.get(pos).getGender().equals("Male")){
+        ZonedDateTime l= ZonedDateTime.parse(m.getJoindate());
+        DateTimeFormatter ft= DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        joindate.setText(ft.format(l).toString());
+        joindate.setEnabled(false);
+
+        address.setText(m.getAddress());
+        details.setText(m.getDetails());
+        if(m.getGender().equals("Male")){
             male.setChecked(true);
-        }else if(DataList.memberList.get(pos).getGender().equals("Female")){
+        }else if(m.getGender().equals("Female")){
             female.setChecked(true);
         }
-        dob.setText(DataList.memberList.get(pos).getDob());
+        dob.setEnabled(false);
+
+        if(!m.getDob().trim().equals("")) {
+            ZonedDateTime l1 = ZonedDateTime.parse(m.getDob());
+            DateTimeFormatter ft1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            dob.setText(ft1.format(l1).toString());
+        }else{
+            dob.setText(m.getDob());
+        }
 
         selectImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -197,6 +218,9 @@ public class EditMemberActivity extends AppCompatActivity {
                         .simple_spinner_dropdown_item);
         spin.setAdapter(ad);
 
+        ArrayAdapter myAdap = (ArrayAdapter) spin.getAdapter(); //cast to an ArrayAdapter
+        int spinnerPosition = myAdap.getPosition(m.getBatchname());
+        spin.setSelection(spinnerPosition);
 
         submit.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -208,68 +232,90 @@ public class EditMemberActivity extends AppCompatActivity {
                 } else if (female.isChecked()) {
                     gender = "Female";
                 }
-                if (gender.equals("Male") || gender.equals("Female")) {
-                    if (!((name.getText().toString()).equals("")) &&
-                            !((mobile.getText().toString()).equals("")) && mobile.length() == 10) {
-                        if (joindate.getText().toString().equals("") ||
-                                verifyDate(joindate.getText().toString())) {
-                            if (dob.getText().toString().equals("") ||
-                                    verifyDate(dob.getText().toString())) {
-                                AlertDialog.Builder builder1 = new AlertDialog.Builder(EditMemberActivity.this);
-                                builder1.setMessage("Are you sure to update member details?");
-                                builder1.setCancelable(true);
+                if(p != null) {
+                    if (gender.equals("Male") || gender.equals("Female")) {
+                        if (!((name.getText().toString()).equals("")) &&
+                                !((mobile.getText().toString()).equals("")) && mobile.length() == 10) {
+                            if (joindate.getText().toString().equals("") ||
+                                    verifyDate(joindate.getText().toString())) {
+                                if (dob.getText().toString().equals("") ||
+                                        verifyDate(dob.getText().toString())) {
+                                    if (Integer.parseInt(p.getBatchtot()) < Integer.parseInt(p.getBatchMaxStrength())) {
+                                        AlertDialog.Builder builder1 = new AlertDialog.Builder(EditMemberActivity.this);
+                                        builder1.setMessage("Are you sure to add a member?");
+                                        builder1.setCancelable(true);
 
-                                String finalGender = gender;
-                                builder1.setPositiveButton(
-                                        "Yes",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
+                                        String finalGender = gender;
+                                        builder1.setPositiveButton(
+                                                "Yes",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        Member mem= new Member(name.getText().toString(),
+                                                                m.getId(),
+                                                                m.getPicurl(),
+                                                                m.getDocurl(),
+                                                                m.getJoindate(),
+                                                                m.getFeepaydate(),
+                                                                m.getExpdate(),
+                                                                mobile.getText().toString(),
+                                                                email.getText().toString(),
+                                                                address.getText().toString(),
+                                                                finalGender, dob.getText().toString(),
+                                                                details.getText().toString(),
+                                                                m.getStatus(),
+                                                                ((p==null)?"":p.getBatchid()),
+                                                                ((p==null)?"":p.getBatchname()));
 
-                                                DataList.memberList.add(new Member(name.getText().toString(),
-                                                        DataList.memberList.get(pos).getId(),
-                                                        "", "",
-                                                        DataList.memberList.get(pos).getJoindate(),
-                                                        DataList.memberList.get(pos).getFeepaydate(),
-                                                        DataList.memberList.get(pos).getExpdate(),
-                                                        mobile.getText().toString(),
-                                                        email.getText().toString(),
-                                                        address.getText().toString(),
-                                                        finalGender, dob.getText().toString(),
-                                                        details.getText().toString(),
-                                                        DataList.memberList.get(pos).getStatus(),
-                                                        ((p==null)?"":p.getBatchid()),
-                                                        ((p==null)?"":p.getBatchname())));
-                                                Toast.makeText(EditMemberActivity.this, "Valid data updated", Toast.LENGTH_SHORT).show();
-                                                finish();
-                                                dialog.cancel();
-                                            }
-                                        });
+                                                        FirebaseDatabase.getInstance().getReference()
+                                                                .child("FITCRM")
+                                                                .child("gyms")
+                                                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                                .child("members")
+                                                                .child(mem.getId())
+                                                                .setValue(mem).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                Toast.makeText(EditMemberActivity.this, "Valid data updated", Toast.LENGTH_SHORT).show();
+                                                                finish();
+                                                            }
+                                                        });
+                                                        dialog.cancel();
+                                                    }
+                                                });
 
-                                builder1.setNegativeButton(
-                                        "No",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                dialog.cancel();
-                                            }
-                                        });
+                                        builder1.setNegativeButton(
+                                                "No",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        dialog.cancel();
+                                                    }
+                                                });
 
-                                AlertDialog alert11 = builder1.create();
-                                alert11.show();
+                                        AlertDialog alert11 = builder1.create();
+                                        alert11.show();
+                                    } else {
+                                        Toast.makeText(EditMemberActivity.this, "This Batch is full", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Toast.makeText(EditMemberActivity.this, "Invalid DOB", Toast.LENGTH_SHORT).show();
+                                }
                             } else {
-                                Toast.makeText(EditMemberActivity.this, "Invalid DOB", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditMemberActivity.this, "Invalid Join Date", Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            Toast.makeText(EditMemberActivity.this, "Invalid Join Date", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(EditMemberActivity.this, "Invalid Data", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(EditMemberActivity.this, "Invalid Data", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditMemberActivity.this, "Invalid Gender", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(EditMemberActivity.this, "Invalid Gender", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(EditMemberActivity.this, "Please select a batch", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
+        
+        
+        
     }
 
     // this function is triggered when

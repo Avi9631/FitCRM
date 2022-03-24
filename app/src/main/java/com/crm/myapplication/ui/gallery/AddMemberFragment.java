@@ -41,6 +41,7 @@ import com.google.firebase.storage.UploadTask;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -100,7 +101,7 @@ public class AddMemberFragment extends Fragment {
     private String arr[]=new String[enableList.size()];
 
 
-    Uri uripro, uridoc;
+    static Uri uripro, uridoc;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -244,15 +245,23 @@ public class AddMemberFragment extends Fragment {
                                                 "Yes",
                                                 new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog, int id) {
+//2 - specified pattern
+                                                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
                                                         Member m = new Member(name.getText().toString(),
                                                                 "",
                                                                 "", "",
-                                                                (joindate.getText().toString()).equals("") ? ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toString() : joindate.getText().toString(),
+                                                                (joindate.getText().toString()).equals("") ? ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toString() :
+                                                                        (LocalDate.parse(joindate.getText().toString().trim(), formatter)
+                                                                        .atStartOfDay(ZoneId.systemDefault())).toString(),
                                                                 "", "", mobile.getText().toString(),
                                                                 email.getText().toString(),
                                                                 address.getText().toString(),
-                                                                finalGender, dob.getText().toString(),
+                                                                finalGender,
+                                                                (dob.getText().toString().equals("")?
+                                                                        "":
+                                                                        (LocalDate.parse(dob.getText().toString().trim(), formatter)
+                                                                                .atStartOfDay(ZoneId.systemDefault())).toString()),
                                                                 details.getText().toString(),
                                                                 "active",
                                                                 ((p == null) ? "" : p.getBatchid()),
@@ -261,7 +270,9 @@ public class AddMemberFragment extends Fragment {
                                                         PlansFragment.loadPlanData();
                                                         Intent i = new Intent(getContext(), AdmissionActivity.class);
                                                         i.putExtra("member", m);
+                                                        if(uridoc != null)
                                                         i.putExtra("uridoc", uridoc.toString());
+                                                        if(uripro != null)
                                                         i.putExtra("uripro", uripro.toString());
                                                         startActivity(i);
                                                         dialog.cancel();

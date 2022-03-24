@@ -154,7 +154,7 @@ public class MemberDetailsActivity extends AppCompatActivity {
 //        dob.setText("DOB :  \n"+
 //                member.getDob());
 
-        Glide.with(this).load(member.getPicurl()).into(v2);
+        Glide.with(this).load(member.getPicurl()).into(v1);
         Glide.with(this).load(member.getDocurl()).into(v2);
 
         String content = "<p><b>Name : </b>" +
@@ -349,7 +349,7 @@ public class MemberDetailsActivity extends AppCompatActivity {
                                 break;
                             case "edit":
                                 i = new Intent(MemberDetailsActivity.this, EditMemberActivity.class);
-                                i.putExtra("position", getIntent().getIntExtra("position", -1));
+                                i.putExtra("id", member.getId());
                                 startActivity(i);
                                 break;
 //                            case "adddays":

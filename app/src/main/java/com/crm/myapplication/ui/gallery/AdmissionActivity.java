@@ -77,9 +77,10 @@ public class AdmissionActivity extends AppCompatActivity {
         }
 
         Member m = (Member) getIntent().getSerializableExtra("member");
+        if(AddMemberFragment.uripro !=null)
         uripro = Uri.parse(getIntent().getStringExtra("uripro"));
+        if(AddMemberFragment.uridoc !=null)
         uridoc = Uri.parse(getIntent().getStringExtra("uridoc"));
-        Toast.makeText(this, uripro.toString(), Toast.LENGTH_SHORT).show();
 
         // get the Firebase  storage reference
         storage = FirebaseStorage.getInstance();
@@ -432,6 +433,10 @@ public class AdmissionActivity extends AppCompatActivity {
                                     .show();
                         }
                     });
+        }else {
+            m.setPicurl("");
+            m.setDocurl("");
+            uploadData(m);
         }
     }
 
