@@ -1,7 +1,9 @@
 package com.crm.myapplication.ui.slideshow;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -140,8 +142,8 @@ String dobstr;
                 member.getStatus() +
                 "</p>"+
         "<p><b>Member Image : </b>" +
-                member.getPicurl() +
-                "</p>"+
+                "<a href="+member.getPicurl()+">"+member.getPicurl() +
+                "</a></p>"+
         "<p><b>Member Document Image : </b>" +
                 member.getDocurl() +
                 "</p>"
@@ -219,9 +221,10 @@ String dobstr;
                         Intent i;
                         switch(m){
                             case "call":
-                                i= new Intent(Intent.ACTION_CALL);
-                                i.setData(Uri.parse("tel:"+member.getMob()));
-                                startActivity(i);
+//                                i= new Intent(Intent.ACTION_CALL);
+//                                i.setData(Uri.parse("tel:"+member.getMob()));
+//                                startActivity(i);
+                                callAtRuntime();
                                 break;
                             case "payfee":
                                 i=new Intent(MemberDetailsActivity.this, PayFeeActivity.class);
@@ -310,5 +313,30 @@ String dobstr;
 
         AlertDialog alert11 = builder1.create();
         alert11.show();
+    }
+
+    public void callAtRuntime(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && checkSelfPermission(Manifest.permission.CALL_PHONE)
+                != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(new String[]{Manifest.permission.CALL_PHONE}, 1);
+        }
+        else {
+            Intent intent = new Intent(Intent.ACTION_CALL);
+            intent.setData(Uri.parse("tel:"+member.getMob()));
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                callAtRuntime();
+            } else {
+                Toast.makeText(this, "Oh No !!!Permission Denied.Try Again !",Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

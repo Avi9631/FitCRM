@@ -2,9 +2,11 @@ package com.crm.myapplication.ui.gallery;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -40,6 +42,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -360,9 +364,22 @@ public class AdmissionActivity extends AppCompatActivity {
                             "/"+FirebaseAuth.getInstance().getCurrentUser().getUid()+"/docpics/"+ FirebaseAuth.getInstance().getCurrentUser().getUid()
                                     + UUID.randomUUID().toString());
 
+
+            Bitmap bmp = null;
+            try {
+                bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), uripro);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            //here you can choose quality factor in third parameter(ex. i choosen 25)
+            bmp.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+            byte[] fileInBytes = baos.toByteArray();
+
             // adding listeners on upload
             // or failure of image
-            ref.putFile(uripro)
+            ref.putBytes(fileInBytes)
                     .addOnSuccessListener(
                             new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
@@ -375,7 +392,20 @@ public class AdmissionActivity extends AppCompatActivity {
                                             Toast.LENGTH_SHORT).show();
 
                                     if(uridoc != null){
-                                        ref1.putFile(uridoc)
+
+                                        Bitmap bmp = null;
+                                        try {
+                                            bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), uridoc);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                                        //here you can choose quality factor in third parameter(ex. i choosen 25)
+                                        bmp.compress(Bitmap.CompressFormat.JPEG, 10, baos);
+                                        byte[] fileInBytes1 = baos.toByteArray();
+
+                                        ref1.putBytes(fileInBytes1)
                                                 .addOnSuccessListener(
                                                         new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                                             @Override

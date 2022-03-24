@@ -366,6 +366,7 @@ public class AddMemberFragment extends Fragment {
                         uripro= data.getData();
                         Bitmap photo = (Bitmap) data.getExtras().get("data");
                         propic.setImageBitmap(photo);
+
                     }
                 }
                 break;
