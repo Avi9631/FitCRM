@@ -16,8 +16,10 @@
         <entry key="app/src/main/res/layout/activity_add_batch.xml" value="0.13253527148353997" />
         <entry key="app/src/main/res/layout/activity_admission.xml" value="0.2" />
         <entry key="app/src/main/res/layout/activity_edit_member.xml" value="0.13253527148353997" />
+        <entry key="app/src/main/res/layout/activity_edit_plan.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.16145833333333334" />
         <entry key="app/src/main/res/layout/activity_member_details.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_plan.xml" value="0.13253527148353997" />
         <entry key="app/src/main/res/layout/activity_profile.xml" value="0.13253527148353997" />
         <entry key="app/src/main/res/layout/app_bar_main.xml" value="0.13253527148353997" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.13253527148353997" />
@@ -27,6 +29,7 @@
         <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.13253527148353997" />
         <entry key="app/src/main/res/layout/item_batch_layout.xml" value="0.33" />
         <entry key="app/src/main/res/layout/item_plan_layout.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/item_sort_member.xml" value="0.33" />
         <entry key="app/src/main/res/layout/nav_header_main.xml" value="0.13253527148353997" />
         <entry key="app/src/main/res/layout/toolbar.xml" value="0.16" />
         <entry key="app/src/main/res/menu/activity_main_drawer.xml" value="0.1" />

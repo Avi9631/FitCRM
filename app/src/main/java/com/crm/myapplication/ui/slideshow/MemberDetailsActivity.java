@@ -32,23 +32,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class MemberDetailsActivity extends AppCompatActivity {
 
-    TextView name;
-    TextView id;
-    TextView picurl;
-    TextView docurl;
-    TextView joindate;
-    TextView expdate;
-    TextView mob;
-    TextView email;
-    TextView address;
-    TextView gender;
-    TextView dob;
     Member member=null;
     ImageView v1, v2;
-
+String dobstr;
     Button call, payFee, msg, idCard, delete, block, edit , addDays;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -70,58 +60,12 @@ public class MemberDetailsActivity extends AppCompatActivity {
         v1= findViewById(R.id.imageView2);
         v2= findViewById(R.id.imageView3);
 
+         member= DataList.memberList.stream()
+                .filter(c-> c.getId().equals(getIntent().getStringExtra("id")))
+                .findAny()
+                .orElse(null);
 
-        FirebaseDatabase.getInstance().getReference()
-                .child("FITCRM")
-                .child("gyms")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("members")
-                .child(getIntent().getStringExtra("id"))
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot d) {
-                         member =new Member(
-                                String.valueOf(d.child("name").getValue()),
-                                String.valueOf(d.child("id").getValue()),
-                                String.valueOf(d.child("picurl").getValue()),
-                                String.valueOf(d.child("docurl").getValue()),
-                                String.valueOf(d.child("joindate").getValue()),
-                                String.valueOf(d.child("feepaydate").getValue()),
-                                String.valueOf(d.child("expdate").getValue()),
-                                String.valueOf(d.child("mob").getValue()),
-                                String.valueOf(d.child("email").getValue()),
-                                String.valueOf(d.child("address").getValue()),
-                                String.valueOf(d.child("gender").getValue()),
-                                String.valueOf(d.child("dob").getValue()),
-                                String.valueOf(d.child("details").getValue()),
-                                String.valueOf(d.child("status").getValue()),
-                                String.valueOf(d.child("batch").getValue()),
-                                 String.valueOf(d.child("batchname").getValue())
-                        );
-                         loaded();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-
-
-//
-//        name= findViewById(R.id.textView4);
-//        id= findViewById(R.id.textView5);
-//        picurl= findViewById(R.id.textView6);
-//        docurl= findViewById(R.id.textView7);
-//        joindate= findViewById(R.id.textView8);
-//        expdate= findViewById(R.id.textView9);
-//        mob= findViewById(R.id.textView10);
-//        email= findViewById(R.id.textView11);
-//        address= findViewById(R.id.textView12);
-//        gender= findViewById(R.id.textView13);
-//        dob= findViewById(R.id.textView14);
-
-
+                loaded();
 
     }
 
@@ -134,28 +78,19 @@ public class MemberDetailsActivity extends AppCompatActivity {
         }else{
             block.setText("BLOCK");
         }
-//
-//        name.setText("Name : \n"+
-//                member.getName());
-//        id.setText("ID :  \n"+
-//                member.getId());
-//        ZonedDateTime z1= ZonedDateTime.parse(member.getJoindate());
-//        joindate.setText("Join Date :  \n"+ z1.getDayOfMonth() +"/"+z1.getMonthValue()+"/"+z1.getYear());
-//        ZonedDateTime z= ZonedDateTime.parse(DataList.memberList.get(getIntent().getIntExtra("position", -1)).getExpdate());
-//        expdate.setText("Exp Date :  \n"+ z.getDayOfMonth() +"/"+z.getMonthValue()+"/"+z.getYear());
-//        mob.setText("Mob :  \n"+
-//                member.getMob());
-//        email.setText("Email :  \n"+
-//                member.getEmail());
-//        address.setText("Address :  \n"+
-//                member.getAddress());
-//        gender.setText("Gender :  \n"+
-//                member.getGender());
-//        dob.setText("DOB :  \n"+
-//                member.getDob());
 
         Glide.with(this).load(member.getPicurl()).into(v1);
         Glide.with(this).load(member.getDocurl()).into(v2);
+
+        DateTimeFormatter ft= DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        if(!member.getDob().trim().equals("")) {
+            ZonedDateTime l1 = ZonedDateTime.parse(member.getDob());
+            DateTimeFormatter ft1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            dobstr= (ft1.format(l1).toString());
+        }else{
+            dobstr= member.getDob();
+        }
 
         String content = "<p><b>Name : </b>" +
                 member.getName() +
@@ -164,11 +99,11 @@ public class MemberDetailsActivity extends AppCompatActivity {
                 member.getId() +
                 "</p>"+
                 "<p><b>Join Date : </b>" +
-                member.getJoindate() +
+                ft.format(ZonedDateTime.parse(member.getJoindate())).toString() +
                 "</p>"+
                 "</p>"+
                 "<p><b>Exp Date : </b>" +
-                member.getExpdate() +
+                ft.format(ZonedDateTime.parse(member.getExpdate())).toString() +
                 "</p>"+
                 "</p>"+
                 "<p><b>Mobile : </b>" +
@@ -187,7 +122,7 @@ public class MemberDetailsActivity extends AppCompatActivity {
                 member.getGender() +
                 "</p>"+
                 "<p><b>DOB : </b>" +
-                member.getDob() +
+                dobstr +
                 "</p>"+
                 "<p><b>Batch : </b>" +
                 member.getBatchname()+
@@ -196,7 +131,7 @@ public class MemberDetailsActivity extends AppCompatActivity {
                 member.getGender() +
                 "</p>"+
                 "<p><b>Last Fee Pay Date : </b>" +
-                member.getFeepaydate() +
+                ft.format(ZonedDateTime.parse(member.getFeepaydate())).toString() +
                 "</p>"+
                 "<p><b>Member Details : </b>" +
                 member.getDetails() +
@@ -206,6 +141,9 @@ public class MemberDetailsActivity extends AppCompatActivity {
                 "</p>"+
         "<p><b>Member Image : </b>" +
                 member.getPicurl() +
+                "</p>"+
+        "<p><b>Member Document Image : </b>" +
+                member.getDocurl() +
                 "</p>"
                 ;
         WebView wb= findViewById(R.id.webview);
@@ -282,7 +220,7 @@ public class MemberDetailsActivity extends AppCompatActivity {
                         switch(m){
                             case "call":
                                 i= new Intent(Intent.ACTION_CALL);
-                                i.setData(Uri.parse("tel:"+mob.getText().toString()));
+                                i.setData(Uri.parse("tel:"+member.getMob()));
                                 startActivity(i);
                                 break;
                             case "payfee":
