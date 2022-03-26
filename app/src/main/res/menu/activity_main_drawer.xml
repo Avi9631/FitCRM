@@ -23,6 +23,10 @@
             android:icon="@mipmap/ic_launcher"
             android:title="View Member" />
         <item
+            android:id="@+id/nav_gymprofiler"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Gym Profile" />
+        <item
             android:id="@+id/nav_signout"
             android:icon="@mipmap/ic_launcher"
             android:title="Log Out" />

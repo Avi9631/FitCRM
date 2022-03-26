@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import com.crm.myapplication.Models.Plan;
 import com.crm.myapplication.ui.batch.BatchFragment;
 import com.crm.myapplication.ui.gallery.AddMemberFragment;
+import com.crm.myapplication.ui.gymprofile.ProfileFragment;
 import com.crm.myapplication.ui.home.HomeFragment;
 import com.crm.myapplication.ui.plans.PlansFragment;
 import com.crm.myapplication.ui.slideshow.ViewMemberFragment;
@@ -89,10 +90,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void displaySelectedScreen(int itemId) {
-
         //creating fragment object
         Fragment fragment = null;
-
         //initializing the fragment object which is selected
         switch (itemId) {
             case R.id.nav_home:
@@ -109,6 +108,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_viewmember:
                 fragment = new ViewMemberFragment();
+                break;
+            case R.id.nav_gymprofiler:
+                fragment = new ProfileFragment();
                 break;
             case R.id.nav_signout:
                 AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
@@ -137,8 +139,6 @@ public class MainActivity extends AppCompatActivity
                 AlertDialog alert11 = builder1.create();
                 alert11.show();
                 break;
-
-
 //            case R.id.nav_menu3:
 //                fragment = new Menu3();
 //                break;
@@ -154,8 +154,6 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
     }
-
-
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
