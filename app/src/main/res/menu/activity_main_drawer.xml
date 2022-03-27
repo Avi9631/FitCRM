@@ -4,31 +4,31 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/ic_home"
             android:title="Home" />
         <item
             android:id="@+id/nav_addmember"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/ic_add_person"
             android:title="Add Member" />
         <item
             android:id="@+id/nav_batch"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/ic_batch"
             android:title="Batch" />
         <item
             android:id="@+id/nav_plans"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/ic_plans"
             android:title="Plans" />
         <item
             android:id="@+id/nav_viewmember"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/ic_view"
             android:title="View Member" />
         <item
             android:id="@+id/nav_gymprofiler"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/ic_profile"
             android:title="Gym Profile" />
         <item
             android:id="@+id/nav_signout"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/ic_signout"
             android:title="Log Out" />
 
     </group>

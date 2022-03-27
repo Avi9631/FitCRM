@@ -30,22 +30,28 @@
             android:label="@string/app_name" />
         <activity
             android:name=".ui.payfee.PayFeeActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:label="Pay Fee"/>
         <activity
             android:name=".ui.slideshow.EditMemberActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:label="Edit Member"/>
         <activity
             android:name=".ui.batch.AddBatchActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:label="Add Batch"/>
         <activity
             android:name=".ui.slideshow.MemberDetailsActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:label="Member Details"/>
         <activity
             android:name=".ui.gallery.AdmissionActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:label="Member Admission"/>
         <activity
             android:name=".ui.plans.PlanActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:label="Add Plans"/>
         <activity
             android:name=".SplashScreenActivity"
             android:exported="true">

@@ -3,7 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable-anydpi/ic_home.xml" value="0.1005" />
         <entry key="app/src/main/res/drawable-anydpi/ic_menu_slideshow.xml" value="0.1685" />
+        <entry key="app/src/main/res/drawable-anydpi/ic_view.xml" value="0.1005" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_menu_camera.xml" value="0.1" />
@@ -22,7 +24,9 @@
         <entry key="app/src/main/res/layout/activity_member_details.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_plan.xml" value="0.13253527148353997" />
         <entry key="app/src/main/res/layout/activity_profile.xml" value="0.2" />
+        <entry key="app/src/main/res/layout/activity_register.xml" value="0.13253527148353997" />
         <entry key="app/src/main/res/layout/app_bar_main.xml" value="0.13253527148353997" />
+        <entry key="app/src/main/res/layout/content_admission.xml" value="0.13253527148353997" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.13253527148353997" />
         <entry key="app/src/main/res/layout/fragment_add_member.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.13253527148353997" />

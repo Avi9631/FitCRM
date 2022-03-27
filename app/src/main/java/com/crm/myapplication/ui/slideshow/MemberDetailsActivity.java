@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -160,6 +161,15 @@ String dobstr;
                 "</p>"
                 ;
         WebView wb= findViewById(R.id.webview);
+
+        // disable scroll on touch
+        wb.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return (event.getAction() == MotionEvent.ACTION_MOVE);
+            }
+        });
+
         wb.loadDataWithBaseURL(null, content, "text/html", "utf-8", null);
 
 
