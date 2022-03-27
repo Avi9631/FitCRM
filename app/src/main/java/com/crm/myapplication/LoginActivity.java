@@ -1,5 +1,6 @@
 package com.crm.myapplication;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,6 +35,8 @@ public class LoginActivity extends AppCompatActivity {
     private TextView forgotPass;
     FirebaseAuth mAuth;
 
+    private Dialog loadingDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,15 +49,23 @@ public class LoginActivity extends AppCompatActivity {
         btn2= findViewById(R.id.btn2);
         forgotPass= findViewById(R.id.textView24);
 
+        loadingDialog= new Dialog(LoginActivity.this);
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
+
         forgotPass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(!email.getText().toString().trim().equals("")) {
+                    loadingDialog.show();
                     FirebaseAuth.getInstance().sendPasswordResetEmail(email.getText().toString())
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
+                                        loadingDialog.dismiss();
                                         AlertDialog.Builder builder1 = new AlertDialog.Builder(LoginActivity.this);
                                         builder1.setMessage("We have send you a mail for password reset !");
                                         builder1.setCancelable(true);
@@ -71,11 +82,13 @@ public class LoginActivity extends AppCompatActivity {
                                         AlertDialog alert11 = builder1.create();
                                         alert11.show();
                                     }else{
+                                        loadingDialog.dismiss();
                                         Toast.makeText(LoginActivity.this, "Email not registered", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
                 }else{
+                    loadingDialog.dismiss();
                     Toast.makeText(LoginActivity.this, "Please input your email to reset the password", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -107,6 +120,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login(){
+        loadingDialog.show();
         mAuth.signInWithEmailAndPassword(email.getText().toString().trim(), pass.getText().toString().trim())
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -115,7 +129,9 @@ public class LoginActivity extends AppCompatActivity {
                             Intent i=new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(i);
                             finish();
+                            loadingDialog.dismiss();
                         } else {
+                            loadingDialog.dismiss();
                             Toast.makeText(LoginActivity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -137,6 +153,7 @@ public class LoginActivity extends AppCompatActivity {
         if(com.crm.myapplication.DataList.planList.size()>0){
             com.crm.myapplication.DataList.planList.clear();
         }
+        loadingDialog.show();
         FirebaseDatabase.getInstance().getReference()
                 .child("FITCRM")
                 .child("gyms")
@@ -180,19 +197,19 @@ public class LoginActivity extends AppCompatActivity {
                                         }
                                         Intent i = new Intent(LoginActivity.this, MainActivity.class);
                                         startActivity(i);finish();
-
+loadingDialog.dismiss();
                                     }
 
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error) {
-
+loadingDialog.dismiss();
                                     }
                                 });
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+loadingDialog.dismiss();
                     }
                 });
     }

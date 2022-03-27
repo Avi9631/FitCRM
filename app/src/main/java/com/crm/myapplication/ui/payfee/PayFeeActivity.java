@@ -1,5 +1,6 @@
 package com.crm.myapplication.ui.payfee;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +22,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.crm.myapplication.DataList;
+import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.Models.MemberFee;
 import com.crm.myapplication.Models.Plan;
@@ -54,6 +57,8 @@ public class PayFeeActivity extends AppCompatActivity {
     private Plan p=null;
     Member m=null;
 
+    Dialog loadingDialog;
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +66,11 @@ public class PayFeeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pay_fee);
          m = (Member) getIntent().getSerializableExtra("member");
 
+        loadingDialog= new Dialog(PayFeeActivity.this);
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
 
         int k=0;
         for(Plan b: enableList){
@@ -213,7 +223,7 @@ public class PayFeeActivity extends AppCompatActivity {
                             "Yes",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-
+loadingDialog.show();
                                     FirebaseDatabase.getInstance().getReference()
                                             .child("FITCRM")
                                             .child("gyms")
@@ -253,11 +263,12 @@ public class PayFeeActivity extends AppCompatActivity {
                                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                             snapshot.getRef().child("expdate").setValue(finalL.toString());
                                                             snapshot.getRef().child("feepaydate").setValue(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+                                                            loadingDialog.dismiss();
                                                         }
 
                                                         @Override
                                                         public void onCancelled(@NonNull DatabaseError error) {
-
+loadingDialog.dismiss();
                                                         }
                                                     });
                                                 }

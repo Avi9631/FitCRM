@@ -1,5 +1,6 @@
 package com.crm.myapplication.ui.profile;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,6 +21,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.crm.myapplication.DataList;
+import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.MainActivity;
 import com.crm.myapplication.Models.Batch;
 import com.crm.myapplication.Models.Plan;
@@ -42,12 +45,20 @@ public class ProfileActivity extends AppCompatActivity {
     public static String gid;
     String emailregistered="";
 
+    Dialog loadingDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
         emailregistered= getIntent().getStringExtra("email");
+
+        loadingDialog= new Dialog(ProfileActivity.this);
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
 
         name = ((EditText) findViewById(R.id.editTextTextPersonName));
         mobile = ((EditText) findViewById(R.id.editTextTextPersonName2));
@@ -106,6 +117,7 @@ public class ProfileActivity extends AppCompatActivity {
         map.put("gym_address", address.getText().toString());
         map.put("gym_details", details.getText().toString());
 
+        loadingDialog.show();
         FirebaseDatabase.getInstance().getReference()
                 .child("FITCRM")
                 .child("gyms")
@@ -117,9 +129,10 @@ public class ProfileActivity extends AppCompatActivity {
                         if(task.isSuccessful()){
                             loadFromDB();
                             Toast.makeText(ProfileActivity.this, "Profile Updated!", Toast.LENGTH_SHORT).show();
-
+loadingDialog.dismiss();
                         }else{
                             Toast.makeText(ProfileActivity.this, "Error Occured!", Toast.LENGTH_SHORT).show();
+                            loadingDialog.dismiss();
                         }
                     }
                 });
@@ -127,6 +140,7 @@ public class ProfileActivity extends AppCompatActivity {
 
 
     public  void loadFromDB(){
+        loadingDialog.show();
         FirebaseDatabase.getInstance().getReference()
                 .child("FITCRM")
                 .child("gyms")
@@ -171,19 +185,20 @@ public class ProfileActivity extends AppCompatActivity {
                                         Intent i = new Intent(ProfileActivity.this, MainActivity.class);
                                         startActivity(i);
                                         finish();
+                                        loadingDialog.dismiss();
 
                                     }
 
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error) {
-
+loadingDialog.dismiss();
                                     }
                                 });
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+loadingDialog.dismiss();
                     }
                 });
     }

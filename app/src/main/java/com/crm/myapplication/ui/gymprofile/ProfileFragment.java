@@ -1,6 +1,7 @@
 package com.crm.myapplication.ui.gymprofile;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,9 +21,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.crm.myapplication.DataList;
+import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -94,6 +97,7 @@ public class ProfileFragment extends Fragment {
     int i = -1;
     public static String gid;
 
+    Dialog loadingDialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -109,8 +113,15 @@ public class ProfileFragment extends Fragment {
         details = ((EditText) v.findViewById(R.id.editTextTextMultiLine));
         submit = v.findViewById(R.id.button2);
 
+        loadingDialog= new Dialog(getContext());
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getContext().getDrawable(R.drawable.rounded_corners));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
+
         email.setEnabled(false);
 
+        loadingDialog.show();
         FirebaseDatabase.getInstance().getReference()
                 .child("FITCRM")
                 .child("gyms")
@@ -128,11 +139,12 @@ public class ProfileFragment extends Fragment {
                         email.setText(DataList.email);
                         address.setText(DataList.address);
                         details.setText(DataList.details);
+                        loadingDialog.dismiss();
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+loadingDialog.dismiss();
                     }
                 });
 
@@ -187,6 +199,7 @@ public class ProfileFragment extends Fragment {
         map.put("gym_address", address.getText().toString());
         map.put("gym_details", details.getText().toString());
 
+        loadingDialog.show();
         FirebaseDatabase.getInstance().getReference()
                 .child("FITCRM")
                 .child("gyms")
@@ -198,8 +211,9 @@ public class ProfileFragment extends Fragment {
                         if(task.isSuccessful()){
 
                             Toast.makeText(getContext(), "Profile Updated!", Toast.LENGTH_SHORT).show();
-
+loadingDialog.dismiss();
                         }else{
+                            loadingDialog.dismiss();
                             Toast.makeText(getContext(), "Error Occured!", Toast.LENGTH_SHORT).show();
                         }
                     }

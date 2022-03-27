@@ -1,11 +1,13 @@
 package com.crm.myapplication.ui.plans;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 
 import androidx.annotation.NonNull;
@@ -13,6 +15,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Plan;
 import com.crm.myapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -29,6 +32,8 @@ public class PlanActivity extends AppCompatActivity {
     EditText planname, fee, duration, desc;
     String durationType;
 
+    Dialog loadingDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +44,12 @@ public class PlanActivity extends AppCompatActivity {
         desc = findViewById(R.id.editTextDate2);
         RadioButton day = (RadioButton) findViewById(R.id.radioButton);
         RadioButton month = (RadioButton) findViewById(R.id.radioButton2);
+
+        loadingDialog= new Dialog(PlanActivity.this);
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
 
         Button btn = findViewById(R.id.button2);
 
@@ -66,7 +77,7 @@ public class PlanActivity extends AppCompatActivity {
                             new DialogInterface.OnClickListener() {
                                 @RequiresApi(api = Build.VERSION_CODES.O)
                                 public void onClick(DialogInterface dialog, int id) {
-
+loadingDialog.show();
                                     String pid= UUID.randomUUID().toString();
                                     FirebaseDatabase.getInstance().getReference()
                                             .child("FITCRM")
@@ -85,6 +96,7 @@ public class PlanActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     finish();
+                                                    loadingDialog.dismiss();
                                                     dialog.cancel();
                                                 }
                                             });

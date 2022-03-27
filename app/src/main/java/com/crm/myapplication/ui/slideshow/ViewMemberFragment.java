@@ -1,5 +1,6 @@
 package com.crm.myapplication.ui.slideshow;
 
+import android.app.Dialog;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -21,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.crm.myapplication.Adapters.MemberAdapter;
 import com.crm.myapplication.DataList;
+import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -88,11 +91,19 @@ public class ViewMemberFragment extends Fragment {
     private MemberAdapter memberAdapter;
     private EditText search;
 
+    Dialog loadingDialog;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_view_member, container, false);
+
+        loadingDialog= new Dialog(getContext());
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getContext().getDrawable(R.drawable.rounded_corners));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
 
         view = v.findViewById(R.id.rec1);
         Spinner spin = v.findViewById(R.id.spinner2);
@@ -108,6 +119,7 @@ public class ViewMemberFragment extends Fragment {
             DataList.memberList.clear();
         }
 
+        loadingDialog.dismiss();
         FirebaseDatabase.getInstance().getReference()
                 .child("FITCRM")
                 .child("gyms")
@@ -141,11 +153,12 @@ public class ViewMemberFragment extends Fragment {
                         memberAdapter = new MemberAdapter(getContext(), DataList.memberList);
                         view.setAdapter(memberAdapter);
                         memberAdapter.notifyDataSetChanged();
+                        loadingDialog.dismiss();
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+loadingDialog.dismiss();
                     }
                 });
 

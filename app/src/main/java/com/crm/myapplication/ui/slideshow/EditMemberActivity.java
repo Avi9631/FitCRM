@@ -1,5 +1,6 @@
 package com.crm.myapplication.ui.slideshow;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -13,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -23,6 +25,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.crm.myapplication.DataList;
+import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Batch;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.R;
@@ -49,6 +52,8 @@ public class EditMemberActivity extends AppCompatActivity {
     Batch p;
     Spinner spin;
 
+    Dialog loadingDialog;
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +66,12 @@ public class EditMemberActivity extends AppCompatActivity {
                 arr[k] = b.getBatchname(); k++;
             }
         }
+
+        loadingDialog= new Dialog(EditMemberActivity.this);
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
 
 
         String id = getIntent().getStringExtra("id");
@@ -266,6 +277,7 @@ public class EditMemberActivity extends AppCompatActivity {
                                                                 ((p==null)?"":p.getBatchid()),
                                                                 ((p==null)?"":p.getBatchname()));
 
+                                                        loadingDialog.show();
                                                         FirebaseDatabase.getInstance().getReference()
                                                                 .child("FITCRM")
                                                                 .child("gyms")
@@ -277,6 +289,7 @@ public class EditMemberActivity extends AppCompatActivity {
                                                             public void onComplete(@NonNull Task<Void> task) {
                                                                 Toast.makeText(EditMemberActivity.this, "Valid data updated", Toast.LENGTH_SHORT).show();
                                                                 finish();
+                                                                loadingDialog.dismiss();
                                                             }
                                                         });
                                                         dialog.cancel();

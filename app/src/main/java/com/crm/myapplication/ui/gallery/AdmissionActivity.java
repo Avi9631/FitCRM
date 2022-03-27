@@ -1,5 +1,6 @@
 package com.crm.myapplication.ui.gallery;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +26,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.crm.myapplication.DataList;
+import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.MainActivity;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.Models.MemberFee;
@@ -68,6 +71,8 @@ public class AdmissionActivity extends AppCompatActivity {
     FirebaseStorage storage;
     StorageReference storageReference;
 
+    Dialog loadingDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +84,12 @@ public class AdmissionActivity extends AppCompatActivity {
                 arr[k] = b.getPlanname(); k++;
             }
         }
+
+        loadingDialog= new Dialog(AdmissionActivity.this);
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
 
         Member m = (Member) getIntent().getSerializableExtra("member");
         if(AddMemberFragment.uripro !=null)
@@ -279,6 +290,7 @@ public class AdmissionActivity extends AppCompatActivity {
 
 
     private void uploadData(Member m){
+        loadingDialog.show();
         FirebaseDatabase.getInstance().getReference()
                 .child("FITCRM")
                 .child("gyms")
@@ -330,12 +342,13 @@ public class AdmissionActivity extends AppCompatActivity {
                                                         Intent i=new Intent(AdmissionActivity.this, MainActivity.class);
                                                         startActivity(i);
                                                         finish();
+                                                        loadingDialog.dismiss();
 
                                                     }
 
                                                     @Override
                                                     public void onCancelled(@NonNull DatabaseError error) {
-
+loadingDialog.dismiss();
                                                     }
                                                 });
 
@@ -378,6 +391,7 @@ public class AdmissionActivity extends AppCompatActivity {
 
             // adding listeners on upload
             // or failure of image
+            loadingDialog.show();
             ref.putBytes(fileInBytes)
                     .addOnSuccessListener(
                             new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -421,6 +435,7 @@ public class AdmissionActivity extends AppCompatActivity {
                                                                             public void onSuccess(Uri uri) {
                                                                                 m.setDocurl(uri.toString());
                                                                                 uploadData(m);
+                                                                                loadingDialog.dismiss();
                                                                             }
                                                                         });
                                                                     }
@@ -436,6 +451,7 @@ public class AdmissionActivity extends AppCompatActivity {
                                                         Toast.makeText(AdmissionActivity.this,
                                                                 "Failed " + e.getMessage(),
                                                                 Toast.LENGTH_SHORT).show();
+                                                        loadingDialog.dismiss();
                                                     }
                                                 });
                                     }else{
@@ -443,6 +459,7 @@ public class AdmissionActivity extends AppCompatActivity {
                                             @Override
                                             public void onSuccess(Uri uri) {
                                                 m.setPicurl(uri.toString());uploadData(m);
+                                                loadingDialog.dismiss();
                                             }
                                         });
                                     }
@@ -460,12 +477,14 @@ public class AdmissionActivity extends AppCompatActivity {
                                             "Failed " + e.getMessage(),
                                             Toast.LENGTH_SHORT)
                                     .show();
+                            loadingDialog.dismiss();
                         }
                     });
         }else {
             m.setPicurl("");
             m.setDocurl("");
             uploadData(m);
+            loadingDialog.dismiss();
         }
     }
 

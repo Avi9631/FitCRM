@@ -1,11 +1,13 @@
 package com.crm.myapplication.ui.batch;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.crm.myapplication.Adapters.BatchAdapter;
 import com.crm.myapplication.DataList;
+import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Batch;
 import com.crm.myapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -77,11 +80,19 @@ public class BatchFragment extends Fragment {
     private RecyclerView view;
     private static BatchAdapter memberAdapter;
 
+    static Dialog loadingDialog;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v= inflater.inflate(R.layout.fragment_batch, container, false);
+
+        loadingDialog= new Dialog(getContext());
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getContext().getDrawable(R.drawable.rounded_corners));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
 
         view= v.findViewById(R.id.planrec);
         floatingActionButton= v.findViewById(R.id.floatingActionButton);
@@ -95,6 +106,7 @@ public class BatchFragment extends Fragment {
         if(DataList.batchList.size()>0){
             DataList.batchList.clear();
         }
+        loadingDialog.show();
         FirebaseDatabase.getInstance().getReference()
                 .child("FITCRM")
                 .child("gyms")
@@ -118,11 +130,12 @@ public class BatchFragment extends Fragment {
                         memberAdapter = new BatchAdapter(getContext(), DataList.batchList);
                         view.setAdapter(memberAdapter);
                         memberAdapter.notifyDataSetChanged();
+                        loadingDialog.dismiss();
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+loadingDialog.dismiss();
                     }
                 });
 
@@ -138,16 +151,8 @@ public class BatchFragment extends Fragment {
     }
 
     public static void changeStatus(String id, String status){
-//        PlanActivity.planList.removeIf(x -> x.getPlanid().equals(id));
-//        for(int i = 0; i< DataList.batchList.size(); i++){
-//            if(DataList.batchList.get(i).getBatchid().equals(id)){
-//                if(status.equals("enable")) {
-//                    DataList.batchList.get(i).setStatus("disable");
-//                }else{
-//                    DataList.batchList.get(i).setStatus("enable");
-//                }
-//            }
         if(status.equals("enable")) {
+            loadingDialog.show();
                     FirebaseDatabase.getInstance().getReference()
                     .child("FITCRM")
                     .child("gyms")
@@ -160,10 +165,14 @@ public class BatchFragment extends Fragment {
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
                                 loadBatchData();
+                                loadingDialog.dismiss();
+                            }else{
+                                loadingDialog.dismiss();
                             }
                         }
                     });
                 }else{
+            loadingDialog.show();
             FirebaseDatabase.getInstance().getReference()
                     .child("FITCRM")
                     .child("gyms")
@@ -176,6 +185,9 @@ public class BatchFragment extends Fragment {
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()){
                        loadBatchData();
+                       loadingDialog.dismiss();
+                    }else{
+                        loadingDialog.dismiss();
                     }
                 }
             });              }
@@ -185,6 +197,7 @@ public class BatchFragment extends Fragment {
         if(DataList.batchList.size()>0){
             DataList.batchList.clear();
         }
+        loadingDialog.show();
         FirebaseDatabase.getInstance().getReference()
                 .child("FITCRM")
                 .child("gyms")
@@ -204,11 +217,12 @@ public class BatchFragment extends Fragment {
                                     String.valueOf(d.child("status").getValue())
                             ));
                         }
+                        loadingDialog.dismiss();
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+loadingDialog.dismiss();
                     }
                 });
 
@@ -216,6 +230,7 @@ public class BatchFragment extends Fragment {
 
     public  static  void deletePlan(String id, int pos , Context ctx){
         if(Integer.parseInt(DataList.batchList.get(pos).getBatchtot()) == 0) {
+            loadingDialog.show();
             FirebaseDatabase.getInstance().getReference()
                     .child("FITCRM")
                     .child("gyms")
@@ -227,14 +242,17 @@ public class BatchFragment extends Fragment {
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
                         loadBatchData();
+                        loadingDialog.dismiss();
                         Toast.makeText(ctx, "Batch Deleted Successfully", Toast.LENGTH_SHORT).show();
                     }else{
+                        loadingDialog.dismiss();
                         Toast.makeText(ctx, "Error Occurred while deleting the Batch", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
 
         }else{
+            loadingDialog.dismiss();
             Toast.makeText(ctx, "Batch has members allocated", Toast.LENGTH_SHORT).show();
         }
     }

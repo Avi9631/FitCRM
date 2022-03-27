@@ -1,10 +1,12 @@
 package com.crm.myapplication.ui.plans;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -13,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.crm.myapplication.Adapters.PlanAdapter;
 import com.crm.myapplication.DataList;
+import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Plan;
 import com.crm.myapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -75,6 +78,8 @@ public class PlansFragment extends Fragment {
     private RecyclerView view;
     private static PlanAdapter memberAdapter;
 
+    static Dialog loadingDialog;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -82,6 +87,12 @@ public class PlansFragment extends Fragment {
         View v= inflater.inflate(R.layout.fragment_plans, container, false);
         view= v.findViewById(R.id.planrec);
         floatingActionButton= v.findViewById(R.id.floatingActionButton);
+
+        loadingDialog= new Dialog(getContext());
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getContext().getDrawable(R.drawable.rounded_corners));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
 
         LinearLayoutManager l= new LinearLayoutManager(getContext());
         l.setOrientation(RecyclerView.VERTICAL);
@@ -93,6 +104,7 @@ public class PlansFragment extends Fragment {
             DataList.planList.clear();
         }
 
+        loadingDialog.show();
         FirebaseDatabase.getInstance().getReference()
                 .child("FITCRM")
                 .child("gyms")
@@ -116,11 +128,12 @@ public class PlansFragment extends Fragment {
                         memberAdapter = new PlanAdapter(getContext(), DataList.planList );
                         view.setAdapter(memberAdapter);
                         memberAdapter.notifyDataSetChanged();
+                        loadingDialog.dismiss();
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+loadingDialog.dismiss();
                     }
                 });
 
@@ -138,6 +151,7 @@ public class PlansFragment extends Fragment {
 
     public static void changeStatus(String id, String status){
         if(status.equals("enable")) {
+            loadingDialog.show();
             FirebaseDatabase.getInstance().getReference()
                     .child("FITCRM")
                     .child("gyms")
@@ -151,10 +165,12 @@ public class PlansFragment extends Fragment {
                     if(task.isSuccessful()){
                         loadPlanData();
                     }
+                    loadingDialog.dismiss();
                 }
             });
 
         }else{
+            loadingDialog.show();
             FirebaseDatabase.getInstance().getReference()
                     .child("FITCRM")
                     .child("gyms")
@@ -168,6 +184,7 @@ public class PlansFragment extends Fragment {
                     if(task.isSuccessful()){
                         loadPlanData();
                     }
+                    loadingDialog.dismiss();
                 }
             });
         }
@@ -178,6 +195,7 @@ public class PlansFragment extends Fragment {
         if(DataList.planList.size()>0){
             DataList.planList.clear();
         }
+        loadingDialog.show();
         FirebaseDatabase.getInstance().getReference()
                 .child("FITCRM")
                 .child("gyms")
@@ -198,11 +216,12 @@ public class PlansFragment extends Fragment {
                                     String.valueOf(d.child("planTimestamp").getValue())
                             ));
                         }
+                        loadingDialog.dismiss();
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+loadingDialog.dismiss();
                     }
                 });
     }

@@ -1,16 +1,19 @@
 package com.crm.myapplication.ui.batch;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Batch;
 import com.crm.myapplication.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,6 +27,8 @@ public class AddBatchActivity extends AppCompatActivity {
 
     EditText batchname, batchstrength, batchdesc;
 
+    Dialog loadingDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +37,12 @@ public class AddBatchActivity extends AppCompatActivity {
         batchname = findViewById(R.id.editTextTextPersonName);
         batchstrength = findViewById(R.id.editTextTextPersonName2);
         batchdesc = findViewById(R.id.editTextDate2);
+
+        loadingDialog= new Dialog(AddBatchActivity.this);
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
 
         Button btn = findViewById(R.id.button2);
 
@@ -50,6 +61,7 @@ public class AddBatchActivity extends AppCompatActivity {
                             new DialogInterface.OnClickListener() {
                                 @RequiresApi(api = Build.VERSION_CODES.O)
                                 public void onClick(DialogInterface dialog, int id) {
+                                    loadingDialog.show();
                                     String bid=UUID.randomUUID().toString();
                                     FirebaseDatabase.getInstance().getReference()
                                             .child("FITCRM")
@@ -63,17 +75,7 @@ public class AddBatchActivity extends AppCompatActivity {
                                                     batchstrength.getText().toString(),
                                                     ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toString(),
                                                     "enable"));
-
-
-//                                    DataList.batchList.add(new Batch(UUID.randomUUID().toString(),
-//                                            batchname.getText().toString(),
-//                                            batchdesc.getText().toString(), "0",
-//                                            batchstrength.getText().toString(),
-//                                            ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toString(),
-//                                            "enable"));
-//                                    Toast.makeText(AddBatchActivity.this,
-//                                            String.valueOf(DataList.batchList.size()),
-//                                            Toast.LENGTH_SHORT).show();
+                                    loadingDialog.dismiss();
                                     finish();
                                     dialog.cancel();
                                 }

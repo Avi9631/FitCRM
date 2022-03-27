@@ -1,6 +1,7 @@
 package com.crm.myapplication.ui.slideshow;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.crm.myapplication.DataList;
+import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.R;
 import com.crm.myapplication.ui.payfee.PayFeeActivity;
@@ -43,6 +46,8 @@ public class MemberDetailsActivity extends AppCompatActivity {
 String dobstr;
     Button call, payFee, msg, idCard, delete, block, edit , addDays;
 
+    Dialog loadingDialog;
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +63,12 @@ String dobstr;
         block= findViewById(R.id.button10);
         delete= findViewById(R.id.button11);
         addDays= findViewById(R.id.button12);
+
+        loadingDialog= new Dialog(MemberDetailsActivity.this);
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
 
         v1= findViewById(R.id.imageView2);
         v2= findViewById(R.id.imageView3);
@@ -256,6 +267,7 @@ String dobstr;
                                 });
                                 break;
                             case "block":
+                                loadingDialog.show();
                                 FirebaseDatabase.getInstance().getReference()
                                         .child("FITCRM")
                                         .child("gyms")
@@ -267,12 +279,13 @@ String dobstr;
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if(task.isSuccessful()){
                                             Toast.makeText(MemberDetailsActivity.this, "Member Moved to Blocked List", Toast.LENGTH_SHORT).show();
-
                                         }
+                                        loadingDialog.dismiss();
                                     }
                                 });
                                 break;
                             case "active":
+                                loadingDialog.show();
                                 FirebaseDatabase.getInstance().getReference()
                                         .child("FITCRM")
                                         .child("gyms")
@@ -285,6 +298,7 @@ String dobstr;
                                         if(task.isSuccessful()){
                                             Toast.makeText(MemberDetailsActivity.this, "Member Moved to Active List", Toast.LENGTH_SHORT).show();
                                         }
+                                        loadingDialog.dismiss();
                                     }
                                 });
                                 break;

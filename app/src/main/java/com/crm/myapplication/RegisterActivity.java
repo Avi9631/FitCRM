@@ -68,6 +68,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void logup(){
+        loadingDialog.show();
         mAuth.createUserWithEmailAndPassword(email.getText().toString().trim(), pass.getText().toString().trim())
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -77,7 +78,9 @@ public class RegisterActivity extends AppCompatActivity {
                             i.putExtra("email", email.getText().toString());
                             startActivity(i);
                             finish();
+                            loadingDialog.dismiss();
                         }else{
+                            loadingDialog.dismiss();
                             Toast.makeText(RegisterActivity.this, "Cannot be registered", Toast.LENGTH_SHORT).show();
                         }
                     }
