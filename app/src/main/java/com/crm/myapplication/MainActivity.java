@@ -1,6 +1,5 @@
 package com.crm.myapplication;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -17,9 +16,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-
-
-import com.crm.myapplication.Models.Plan;
 import com.crm.myapplication.ui.batch.BatchFragment;
 import com.crm.myapplication.ui.gallery.AddMemberFragment;
 import com.crm.myapplication.ui.gymprofile.ProfileFragment;

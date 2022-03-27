@@ -356,13 +356,12 @@ public class AdmissionActivity extends AppCompatActivity {
                     = storageReference
                     .child(
                             "/"+FirebaseAuth.getInstance().getCurrentUser().getUid()+"/propics/"
-
-                                    + UUID.randomUUID().toString());
+                                    + m.getId());
             StorageReference ref1
                     = storageReference
                     .child(
-                            "/"+FirebaseAuth.getInstance().getCurrentUser().getUid()+"/docpics/"+ FirebaseAuth.getInstance().getCurrentUser().getUid()
-                                    + UUID.randomUUID().toString());
+                            "/"+FirebaseAuth.getInstance().getCurrentUser().getUid()+"/docpics/"
+                                    + m.getId());
 
 
             Bitmap bmp = null;
