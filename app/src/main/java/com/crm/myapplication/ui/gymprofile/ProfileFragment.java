@@ -24,15 +24,21 @@ import android.widget.Toast;
 
 import com.crm.myapplication.DataList;
 import com.crm.myapplication.R;
-import com.crm.myapplication.ui.profile.ProfileActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -83,11 +89,11 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    ImageView propic;
     EditText name, mobile, email, address, details;
-    Button selectImage, submit;
+    Button  submit;
     int i = -1;
     public static String gid;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -95,13 +101,12 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         View v= inflater.inflate(R.layout.fragment_profile, container, false);
 
+
         name = (v.findViewById(R.id.editTextTextPersonName));
         mobile = (v.findViewById(R.id.editTextTextPersonName2));
         email = ((EditText) v.findViewById(R.id.editTextTextPersonName3));
         address = ((EditText) v.findViewById(R.id.editTextTextPersonName4));
         details = ((EditText) v.findViewById(R.id.editTextTextMultiLine));
-        propic = v.findViewById(R.id.imageView);
-        selectImage = v.findViewById(R.id.button);
         submit = v.findViewById(R.id.button2);
 
         email.setEnabled(false);
@@ -130,48 +135,6 @@ public class ProfileFragment extends Fragment {
 
                     }
                 });
-
-        selectImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                AlertDialog.Builder builder1 = new AlertDialog.Builder(getContext());
-                builder1.setMessage("Select Image from");
-                builder1.setCancelable(true);
-
-                builder1.setPositiveButton(
-                        "Camera",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                i = 0;
-                                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                startActivityForResult(takePicture, 0);
-                                dialog.cancel();
-                            }
-                        });
-
-                builder1.setNegativeButton(
-                        "Gallery",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                i = 1;
-                                imageChooser();
-                                dialog.cancel();
-                            }
-                        });
-
-                builder1.setNeutralButton("Close", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int i) {
-                        dialog.cancel();
-                    }
-                });
-
-                AlertDialog alert11 = builder1.create();
-                alert11.show();
-
-            }
-        });
 
 
         submit.setOnClickListener(new View.OnClickListener() {
@@ -210,9 +173,6 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-
-
-
         return v;
     }
 
@@ -245,56 +205,6 @@ public class ProfileFragment extends Fragment {
                     }
                 });
     }
-
-
-    // this function is triggered when
-    // the Select Image Button is clicked
-    void imageChooser() {
-        // create an instance of the
-        // intent of the type image
-        Intent i = new Intent();
-        i.setType("image/*");
-        i.setAction(Intent.ACTION_GET_CONTENT);
-
-        // pass the constant to compare it
-        // with the returned requestCode
-        startActivityForResult(Intent.createChooser(i, "Select Picture"), 200);
-    }
-
-    // this function is triggered when user
-    // selects the image from the imageChooser
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (i) {
-            case 0:
-                if (resultCode == Activity.RESULT_OK) {
-                    // compare the resultCode with the
-                    // SELECT_PICTURE constant
-                    if (requestCode == 0) {
-                        // Get the url of the image from data
-                        Bitmap photo = (Bitmap) data.getExtras().get("data");
-                        propic.setImageBitmap(photo);
-                    }
-                }
-                break;
-            case 1:
-                if (resultCode == Activity.RESULT_OK) {
-                    // compare the resultCode with the
-                    // SELECT_PICTURE constant
-                    if (requestCode == 200) {
-                        // Get the url of the image from data
-                        Uri selectedImageUri1 = data.getData();
-                        if (null != selectedImageUri1) {
-                            // update the preview image in the layout
-                            propic.setImageURI(selectedImageUri1);
-                        }
-                    }
-                }
-                break;
-        }
-
-    }
-
 
 }
 

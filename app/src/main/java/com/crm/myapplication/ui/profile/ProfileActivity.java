@@ -36,68 +36,27 @@ import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    ImageView propic;
     EditText name, mobile, email, address, details;
-    Button selectImage, submit;
+    Button  submit;
     int i = -1;
     public static String gid;
+    String emailregistered="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        emailregistered= getIntent().getStringExtra("email");
+
         name = ((EditText) findViewById(R.id.editTextTextPersonName));
         mobile = ((EditText) findViewById(R.id.editTextTextPersonName2));
         email = ((EditText) findViewById(R.id.editTextTextPersonName3));
         address = ((EditText) findViewById(R.id.editTextTextPersonName4));
         details = ((EditText) findViewById(R.id.editTextTextMultiLine));
-        propic = findViewById(R.id.imageView);
-        selectImage = findViewById(R.id.button);
         submit = findViewById(R.id.button2);
-
-        selectImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                AlertDialog.Builder builder1 = new AlertDialog.Builder(ProfileActivity.this);
-                builder1.setMessage("Select Image from");
-                builder1.setCancelable(true);
-
-                builder1.setPositiveButton(
-                        "Camera",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                i = 0;
-                                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                startActivityForResult(takePicture, 0);
-                                dialog.cancel();
-                            }
-                        });
-
-                builder1.setNegativeButton(
-                        "Gallery",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                i = 1;
-                                imageChooser();
-                                dialog.cancel();
-                            }
-                        });
-
-                builder1.setNeutralButton("Close", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int i) {
-                        dialog.cancel();
-                    }
-                });
-
-                AlertDialog alert11 = builder1.create();
-                alert11.show();
-
-            }
-        });
-
+        email.setEnabled(false);
+        email.setText(emailregistered);
 
         submit.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -210,7 +169,8 @@ public class ProfileActivity extends AppCompatActivity {
                                             ));
                                         }
                                         Intent i = new Intent(ProfileActivity.this, MainActivity.class);
-                                        startActivity(i);finish();
+                                        startActivity(i);
+                                        finish();
 
                                     }
 
@@ -228,51 +188,4 @@ public class ProfileActivity extends AppCompatActivity {
                 });
     }
 
-    // this function is triggered when
-    // the Select Image Button is clicked
-    void imageChooser() {
-        // create an instance of the
-        // intent of the type image
-        Intent i = new Intent();
-        i.setType("image/*");
-        i.setAction(Intent.ACTION_GET_CONTENT);
-
-        // pass the constant to compare it
-        // with the returned requestCode
-        startActivityForResult(Intent.createChooser(i, "Select Picture"), 200);
-    }
-
-    // this function is triggered when user
-    // selects the image from the imageChooser
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (i) {
-            case 0:
-                if (resultCode == RESULT_OK) {
-                    // compare the resultCode with the
-                    // SELECT_PICTURE constant
-                    if (requestCode == 0) {
-                        // Get the url of the image from data
-                        Bitmap photo = (Bitmap) data.getExtras().get("data");
-                        propic.setImageBitmap(photo);
-                    }
-                }
-                break;
-            case 1:
-                if (resultCode == RESULT_OK) {
-                    // compare the resultCode with the
-                    // SELECT_PICTURE constant
-                    if (requestCode == 200) {
-                        // Get the url of the image from data
-                        Uri selectedImageUri1 = data.getData();
-                        if (null != selectedImageUri1) {
-                            // update the preview image in the layout
-                            propic.setImageURI(selectedImageUri1);
-                        }
-                    }
-                }
-                break;
-        }
-
-    }
 }

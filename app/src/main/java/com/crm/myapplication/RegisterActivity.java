@@ -66,7 +66,9 @@ public class RegisterActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             Intent i=new Intent(RegisterActivity.this, ProfileActivity.class);
+                            i.putExtra("email", email.getText().toString());
                             startActivity(i);
+                            finish();
                         }else{
                             Toast.makeText(RegisterActivity.this, "Cannot be registered", Toast.LENGTH_SHORT).show();
                         }

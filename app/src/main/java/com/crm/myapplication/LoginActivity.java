@@ -63,6 +63,15 @@ public class LoginActivity extends AppCompatActivity {
                                                 "OK",
                                                 new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog, int id) {
+                                                        FirebaseAuth.getInstance().sendPasswordResetEmail("user@example.com")
+                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                        if (task.isSuccessful()) {
+                                                                            Toast.makeText(LoginActivity.this, "Please check your registered email for password reset", Toast.LENGTH_SHORT).show();;
+                                                                        }
+                                                                    }
+                                                                });
                                                         dialog.cancel();
                                                     }
                                                 });
