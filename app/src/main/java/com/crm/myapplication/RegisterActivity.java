@@ -1,5 +1,6 @@
 package com.crm.myapplication;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,6 +27,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Button btn1;
     FirebaseAuth mAuth;
 
+    private Dialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,12 @@ public class RegisterActivity extends AppCompatActivity {
         pass= findViewById(R.id.pass);
         confirmpass= findViewById(R.id.confirmpass);
         btn1= findViewById(R.id.btn1);
+
+        loadingDialog= new Dialog(RegisterActivity.this);
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
 
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override

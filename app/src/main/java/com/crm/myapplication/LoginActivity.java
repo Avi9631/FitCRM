@@ -49,29 +49,21 @@ public class LoginActivity extends AppCompatActivity {
         forgotPass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!email.getText().toString().equals("")) {
+                if(!email.getText().toString().trim().equals("")) {
                     FirebaseAuth.getInstance().sendPasswordResetEmail(email.getText().toString())
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         AlertDialog.Builder builder1 = new AlertDialog.Builder(LoginActivity.this);
-                                        builder1.setMessage("We have send you a mail for password reset?");
+                                        builder1.setMessage("We have send you a mail for password reset !");
                                         builder1.setCancelable(true);
 
                                         builder1.setPositiveButton(
                                                 "OK",
                                                 new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog, int id) {
-                                                        FirebaseAuth.getInstance().sendPasswordResetEmail("user@example.com")
-                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                    @Override
-                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                        if (task.isSuccessful()) {
-                                                                            Toast.makeText(LoginActivity.this, "Please check your registered email for password reset", Toast.LENGTH_SHORT).show();;
-                                                                        }
-                                                                    }
-                                                                });
+
                                                         dialog.cancel();
                                                     }
                                                 });
