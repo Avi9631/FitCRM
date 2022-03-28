@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Plan;
@@ -38,6 +39,11 @@ public class PlanActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_plan);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle("Add Plans");
+
         planname = findViewById(R.id.editTextTextPersonName);
         fee = findViewById(R.id.editTextTextPersonName2);
         duration = findViewById(R.id.editTextDate);

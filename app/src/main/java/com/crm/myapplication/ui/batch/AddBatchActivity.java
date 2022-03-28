@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Batch;
@@ -33,6 +34,10 @@ public class AddBatchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_batch);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle("Add Batch");
 
         batchname = findViewById(R.id.editTextTextPersonName);
         batchstrength = findViewById(R.id.editTextTextPersonName2);

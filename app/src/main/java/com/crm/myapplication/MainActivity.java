@@ -31,11 +31,13 @@ import com.google.firebase.auth.FirebaseAuth;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
@@ -92,21 +94,27 @@ public class MainActivity extends AppCompatActivity
         switch (itemId) {
             case R.id.nav_home:
                 fragment = new HomeFragment();
+                toolbar.setTitle("Home");
                 break;
             case R.id.nav_plans:
                 fragment = new PlansFragment();
+                toolbar.setTitle("Plans");
                 break;
             case R.id.nav_batch:
                 fragment = new BatchFragment();
+                toolbar.setTitle("Batch");
                 break;
             case R.id.nav_addmember:
                 fragment = new AddMemberFragment();
+                toolbar.setTitle("Add Member");
                 break;
             case R.id.nav_viewmember:
                 fragment = new ViewMemberFragment();
+                toolbar.setTitle("View Members");
                 break;
             case R.id.nav_gymprofiler:
                 fragment = new ProfileFragment();
+                toolbar.setTitle("Gym Profile");
                 break;
             case R.id.nav_signout:
                 AlertDialog.Builder builder1 = new AlertDialog.Builder(this);

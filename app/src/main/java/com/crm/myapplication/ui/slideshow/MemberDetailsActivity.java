@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.crm.myapplication.DataList;
@@ -54,6 +55,10 @@ String dobstr;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_member_details);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle("Member Details");
 
         call= findViewById(R.id.button3);
         payFee= findViewById(R.id.button5);
@@ -157,8 +162,8 @@ String dobstr;
                 "<a href="+member.getPicurl()+">"+member.getPicurl() +
                 "</a></p>"+
         "<p><b>Member Document Image : </b>" +
-                member.getDocurl() +
-                "</p>"
+                "<a href="+member.getDocurl()+">"+member.getDocurl() +
+                "</a></p>"
                 ;
         WebView wb= findViewById(R.id.webview);
 
