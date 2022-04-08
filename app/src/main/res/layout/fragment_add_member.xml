@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.crm.fitcrm.ui.gallery.AddMemberFragment">
+    android:background="@drawable/gradient1"
+    tools:context="com.crm.myapplication.ui.gallery.AddMemberFragment">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
