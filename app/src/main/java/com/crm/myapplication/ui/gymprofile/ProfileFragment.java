@@ -1,47 +1,33 @@
 package com.crm.myapplication.ui.gymprofile;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
-
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+
 import com.crm.myapplication.DataList;
-import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,11 +42,15 @@ public class ProfileFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    public static String gid;
+    EditText name, mobile, email, address, details;
+    Button submit;
+    int i = -1;
+    @Nullable
+    Dialog loadingDialog;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
     public ProfileFragment() {
         // Required empty public constructor
     }
@@ -74,6 +64,7 @@ public class ProfileFragment extends Fragment {
      * @return A new instance of fragment ProfileFragment.
      */
     // TODO: Rename and change types and number of parameters
+    @NonNull
     public static ProfileFragment newInstance(String param1, String param2) {
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
@@ -92,18 +83,11 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    EditText name, mobile, email, address, details;
-    Button  submit;
-    int i = -1;
-    public static String gid;
-
-    Dialog loadingDialog;
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v= inflater.inflate(R.layout.fragment_profile, container, false);
+        View v = inflater.inflate(R.layout.fragment_profile, container, false);
 
 
         name = (v.findViewById(R.id.editTextTextPersonName));
@@ -113,7 +97,7 @@ public class ProfileFragment extends Fragment {
         details = ((EditText) v.findViewById(R.id.editTextTextMultiLine));
         submit = v.findViewById(R.id.button2);
 
-        loadingDialog= new Dialog(getContext());
+        loadingDialog = new Dialog(getContext());
         loadingDialog.setContentView(R.layout.loading);
         loadingDialog.getWindow().setBackgroundDrawable(getContext().getDrawable(R.drawable.rounded_corners));
         loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -129,11 +113,11 @@ public class ProfileFragment extends Fragment {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        DataList.name =String.valueOf(snapshot.child("gym_name").getValue());
-                        DataList.mobile =String.valueOf(snapshot.child("gym_mobile").getValue());
-                        DataList.email =String.valueOf(snapshot.child("gym_email").getValue());
-                        DataList.address =String.valueOf(snapshot.child("gym_address").getValue());
-                        DataList.details =String.valueOf(snapshot.child("gym_details").getValue());
+                        DataList.name = String.valueOf(snapshot.child("gym_name").getValue());
+                        DataList.mobile = String.valueOf(snapshot.child("gym_mobile").getValue());
+                        DataList.email = String.valueOf(snapshot.child("gym_email").getValue());
+                        DataList.address = String.valueOf(snapshot.child("gym_address").getValue());
+                        DataList.details = String.valueOf(snapshot.child("gym_details").getValue());
                         name.setText(DataList.name);
                         mobile.setText(DataList.mobile);
                         email.setText(DataList.email);
@@ -144,7 +128,7 @@ public class ProfileFragment extends Fragment {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-loadingDialog.dismiss();
+                        loadingDialog.dismiss();
                     }
                 });
 
@@ -163,7 +147,7 @@ loadingDialog.dismiss();
                     builder1.setPositiveButton(
                             "Yes",
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
+                                public void onClick(@NonNull DialogInterface dialog, int id) {
                                     saveToDB();
                                     dialog.cancel();
                                 }
@@ -172,7 +156,7 @@ loadingDialog.dismiss();
                     builder1.setNegativeButton(
                             "No",
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
+                                public void onClick(@NonNull DialogInterface dialog, int id) {
                                     dialog.cancel();
                                 }
                             });
@@ -189,10 +173,9 @@ loadingDialog.dismiss();
     }
 
 
-
     private void saveToDB() {
 
-        Map<String, String> map=new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         map.put("gym_name", name.getText().toString());
         map.put("gym_mobile", mobile.getText().toString());
         map.put("gym_email", email.getText().toString());
@@ -208,11 +191,11 @@ loadingDialog.dismiss();
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
 
                             Toast.makeText(getContext(), "Profile Updated!", Toast.LENGTH_SHORT).show();
-loadingDialog.dismiss();
-                        }else{
+                            loadingDialog.dismiss();
+                        } else {
                             loadingDialog.dismiss();
                             Toast.makeText(getContext(), "Error Occured!", Toast.LENGTH_SHORT).show();
                         }

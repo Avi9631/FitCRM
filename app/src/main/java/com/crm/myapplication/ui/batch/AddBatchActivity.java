@@ -9,12 +9,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Batch;
 import com.crm.myapplication.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -43,7 +43,7 @@ public class AddBatchActivity extends AppCompatActivity {
         batchstrength = findViewById(R.id.editTextTextPersonName2);
         batchdesc = findViewById(R.id.editTextDate2);
 
-        loadingDialog= new Dialog(AddBatchActivity.this);
+        loadingDialog = new Dialog(AddBatchActivity.this);
         loadingDialog.setContentView(R.layout.loading);
         loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
         loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -65,9 +65,9 @@ public class AddBatchActivity extends AppCompatActivity {
                             "Yes",
                             new DialogInterface.OnClickListener() {
                                 @RequiresApi(api = Build.VERSION_CODES.O)
-                                public void onClick(DialogInterface dialog, int id) {
+                                public void onClick(@NonNull DialogInterface dialog, int id) {
                                     loadingDialog.show();
-                                    String bid=UUID.randomUUID().toString();
+                                    String bid = UUID.randomUUID().toString();
                                     FirebaseDatabase.getInstance().getReference()
                                             .child("FITCRM")
                                             .child("gyms")
@@ -89,7 +89,7 @@ public class AddBatchActivity extends AppCompatActivity {
                     builder1.setNegativeButton(
                             "No",
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
+                                public void onClick(@NonNull DialogInterface dialog, int id) {
                                     dialog.cancel();
                                 }
                             });

@@ -17,13 +17,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.crm.myapplication.DataList;
-import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.Models.MemberFee;
 import com.crm.myapplication.Models.Plan;
@@ -45,42 +45,43 @@ import java.util.stream.Collectors;
 
 public class PayFeeActivity extends AppCompatActivity {
 
+    private final List<Plan> enableList = DataList.planList
+            .stream().filter(m -> m.getStatus().equals("enable")).collect(Collectors.toList());
+    private final String[] arr = new String[enableList.size()];
     Spinner spin;
     double total;
     double a, b, c, d, f;
+    @Nullable
+    Member m = null;
+    Dialog loadingDialog;
     private TextView name, payScale, admsnFeeTxt, feeTxt, taxTxt, tot, discText, fineTxt;
     private Button submit;
     private EditText admsnFee, discFee, tax, fine;
-
-    private List<Plan> enableList= DataList.planList
-            .stream().filter(m -> m.getStatus().equals("enable")).collect(Collectors.toList());
-    private String arr[]=new String[enableList.size()];
-    private Plan p=null;
-    Member m=null;
-
-    Dialog loadingDialog;
+    @Nullable
+    private Plan p = null;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pay_fee);
-         m = (Member) getIntent().getSerializableExtra("member");
+        m = (Member) getIntent().getSerializableExtra("member");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("Pay Fees");
 
-        loadingDialog= new Dialog(PayFeeActivity.this);
+        loadingDialog = new Dialog(PayFeeActivity.this);
         loadingDialog.setContentView(R.layout.loading);
         loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
         loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         loadingDialog.setCancelable(false);
 
-        int k=0;
-        for(Plan b: enableList){
-            if(b.getStatus().equals("enable")) {
-                arr[k] = b.getPlanname(); k++;
+        int k = 0;
+        for (Plan b : enableList) {
+            if (b.getStatus().equals("enable")) {
+                arr[k] = b.getPlanname();
+                k++;
             }
         }
 
@@ -97,8 +98,8 @@ public class PayFeeActivity extends AppCompatActivity {
         discFee = findViewById(R.id.editTextTextPersonName12);
         spin = findViewById(R.id.spinner4);
         discText = findViewById(R.id.textView23);
-        fine= findViewById(R.id.editTextTextPersonName5);
-        fineTxt= findViewById(R.id.textView26);
+        fine = findViewById(R.id.editTextTextPersonName5);
+        fineTxt = findViewById(R.id.textView26);
 
         name.setText("Name : " + m.getName());
 
@@ -109,7 +110,7 @@ public class PayFeeActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public void onTextChanged(@NonNull CharSequence charSequence, int i, int i1, int i2) {
                 if (!charSequence.toString().equals("")) {
                     f = Double.parseDouble(charSequence.toString());
                 } else {
@@ -131,7 +132,7 @@ public class PayFeeActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public void onTextChanged(@NonNull CharSequence charSequence, int i, int i1, int i2) {
                 if (!charSequence.toString().equals("")) {
                     d = Double.parseDouble(charSequence.toString());
                 } else {
@@ -153,7 +154,7 @@ public class PayFeeActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public void onTextChanged(@NonNull CharSequence charSequence, int i, int i1, int i2) {
                 if (!charSequence.toString().equals("")) {
                     a = Double.parseDouble(charSequence.toString());
                 } else {
@@ -175,7 +176,7 @@ public class PayFeeActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public void onTextChanged(@NonNull CharSequence charSequence, int i, int i1, int i2) {
                 if (!charSequence.toString().equals("")) {
                     b = Double.parseDouble(charSequence.toString());
                 } else {
@@ -197,7 +198,7 @@ public class PayFeeActivity extends AppCompatActivity {
                         arr[i],
                         Toast.LENGTH_LONG)
                         .show();
-                p= enableList.get(i);
+                p = enableList.get(i);
                 c = Double.parseDouble(enableList.get(i).getPlanfee());
                 setData();
             }
@@ -219,7 +220,7 @@ public class PayFeeActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
-                if(total>0){
+                if (total > 0) {
                     AlertDialog.Builder builder1 = new AlertDialog.Builder(PayFeeActivity.this);
                     builder1.setMessage("Are you sure to pay the fee?");
                     builder1.setCancelable(true);
@@ -228,7 +229,7 @@ public class PayFeeActivity extends AppCompatActivity {
                             "Yes",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-loadingDialog.show();
+                                    loadingDialog.show();
                                     FirebaseDatabase.getInstance().getReference()
                                             .child("FITCRM")
                                             .child("gyms")
@@ -249,12 +250,12 @@ loadingDialog.show();
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
-                                                    ZonedDateTime l= ZonedDateTime.parse(m.getExpdate());
+                                                    ZonedDateTime l = ZonedDateTime.parse(m.getExpdate());
                                                     ZonedDateTime l1 = null;
-                                                    if(p.getPlandurationtype().equals("Month")){
-                                                        l1= l.plusMonths(Long.parseLong(p.getPlanduration()));
-                                                    }else if(p.getPlandurationtype().equals("Day")){
-                                                        l1= l.plusDays(Long.parseLong(p.getPlanduration()));
+                                                    if (p.getPlandurationtype().equals("Month")) {
+                                                        l1 = l.plusMonths(Long.parseLong(p.getPlanduration()));
+                                                    } else if (p.getPlandurationtype().equals("Day")) {
+                                                        l1 = l.plusDays(Long.parseLong(p.getPlanduration()));
                                                     }
 
                                                     ZonedDateTime finalL = l1;
@@ -273,13 +274,13 @@ loadingDialog.show();
 
                                                         @Override
                                                         public void onCancelled(@NonNull DatabaseError error) {
-loadingDialog.dismiss();
+                                                            loadingDialog.dismiss();
                                                         }
                                                     });
                                                 }
                                             });
 
-                                    Toast.makeText(PayFeeActivity.this, "Fee Paid "+m.getExpdate(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(PayFeeActivity.this, "Fee Paid " + m.getExpdate(), Toast.LENGTH_SHORT).show();
                                     finish();
                                 }
                             });
@@ -287,14 +288,14 @@ loadingDialog.dismiss();
                     builder1.setNegativeButton(
                             "No",
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
+                                public void onClick(@NonNull DialogInterface dialog, int id) {
                                     dialog.cancel();
                                 }
                             });
 
                     AlertDialog alert11 = builder1.create();
                     alert11.show();
-                }else {
+                } else {
                     Toast.makeText(PayFeeActivity.this, "Invalid Data", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -307,23 +308,24 @@ loadingDialog.dismiss();
         feeTxt.setText("Fee : Rs." + c + "/-");
         taxTxt.setText("Tax : Rs." + b + "/-");
         discText.setText("Disc : Rs." + d + "/-");
-        fineTxt.setText("Fine : Rs."+f+"/-");
+        fineTxt.setText("Fine : Rs." + f + "/-");
         total = (a + b + c + f) - d;
         tot.setText("Tot Amt to be Paid : Rs." + total + "/-");
 
-        if(p==null){
+        if (p == null) {
             payScale.setText("Pay Scale: ");
-        }else{
-            ZonedDateTime l= ZonedDateTime.parse(m.getExpdate());
+        } else {
+            ZonedDateTime l = ZonedDateTime.parse(m.getExpdate());
             ZonedDateTime l1 = null;
-            if(p.getPlandurationtype().equals("Month")){
-                l1= l.plusMonths(Long.parseLong(p.getPlanduration()));
-            }else if(p.getPlandurationtype().equals("Day")){
-                l1= l.plusDays(Long.parseLong(p.getPlanduration()));
+            if (p.getPlandurationtype().equals("Month")) {
+                l1 = l.plusMonths(Long.parseLong(p.getPlanduration()));
+            } else if (p.getPlandurationtype().equals("Day")) {
+                l1 = l.plusDays(Long.parseLong(p.getPlanduration()));
             }
-            DateTimeFormatter ft= DateTimeFormatter.ofPattern("dd/MM/uuuu");
+            DateTimeFormatter ft = DateTimeFormatter.ofPattern("dd/MM/uuuu");
 
-            payScale.setText("Pay Scale: "+ft.format(l).toString()+" To "+ft.format(l1).toString());        }
+            payScale.setText("Pay Scale: " + ft.format(l) + " To " + ft.format(l1));
+        }
 
     }
 }

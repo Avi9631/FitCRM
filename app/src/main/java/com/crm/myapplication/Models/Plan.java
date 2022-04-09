@@ -19,7 +19,7 @@ public class Plan {
         this.plandurationtype = plandurationtype;
         this.plandesc = plandesc;
         this.status = status;
-        this.planTimestamp=planTimestamp;
+        this.planTimestamp = planTimestamp;
     }
 
     public String getPlanTimestamp() {

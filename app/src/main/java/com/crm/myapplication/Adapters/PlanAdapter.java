@@ -23,8 +23,8 @@ import java.util.List;
 
 public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.MyViewHolder> {
 
-    private Context mContext;
-    private List<Plan> mData ;
+    private final Context mContext;
+    private final List<Plan> mData;
 
     public PlanAdapter(Context mContext, List<Plan> mData) {
         this.mContext = mContext;
@@ -41,13 +41,13 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.MyViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        String planname=  mData.get(position).getPlanname();
-        String id=   mData.get(position).getPlanid();
-        String planfee=  mData.get(position).getPlanfee();
-        String planduration=   mData.get(position).getPlanduration();
-        String plandurationType=  mData.get(position).getPlandurationtype();
-        String plandesc=   mData.get(position).getPlandesc();
-        String planStatus= mData.get(position).getStatus();
+        String planname = mData.get(position).getPlanname();
+        String id = mData.get(position).getPlanid();
+        String planfee = mData.get(position).getPlanfee();
+        String planduration = mData.get(position).getPlanduration();
+        String plandurationType = mData.get(position).getPlandurationtype();
+        String plandesc = mData.get(position).getPlandesc();
+        String planStatus = mData.get(position).getStatus();
 
         holder.setData(planname, id, planfee, planduration, plandurationType, plandesc, planStatus, position);
 
@@ -60,38 +60,39 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.MyViewHolder> 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
+        private final Button deleteBtn;
+        private final Button statusBtn;
         TextView planname, fee, duration, desc, status;
-        private Button deleteBtn, statusBtn;
 
-        public MyViewHolder(View itemView) {
+        public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             planname = itemView.findViewById(R.id.textView6);
             fee = itemView.findViewById(R.id.textView8);
             duration = itemView.findViewById(R.id.textView10);
             desc = itemView.findViewById(R.id.textView12);
-            statusBtn= itemView.findViewById(R.id.button3);
+            statusBtn = itemView.findViewById(R.id.button3);
             deleteBtn = itemView.findViewById(R.id.button14);
-            status= itemView.findViewById(R.id.textView28);
+            status = itemView.findViewById(R.id.textView28);
 
         }
 
 
-        public void setData(String planname, String id, String planfee, String planduration, String plandurationType, String plandesc, String planStatus, int position) {
+        public void setData(String planname, @NonNull String id, String planfee, String planduration, String plandurationType, String plandesc, @NonNull String planStatus, int position) {
             this.planname.setText(planname);
             this.fee.setText(planfee);
-            this.duration.setText(planduration+" "+plandurationType);
+            this.duration.setText(planduration + " " + plandurationType);
             this.desc.setText(plandesc);
-            if(planStatus.equals("enable")){
+            if (planStatus.equals("enable")) {
                 this.status.setText("ACTIVE");
                 this.status.setBackgroundColor(Color.parseColor("#26580f"));
-            }else if( planStatus.equals("disable")){
+            } else if (planStatus.equals("disable")) {
                 this.status.setText("DISABLED");
                 this.status.setBackgroundColor(Color.parseColor("#ff0000"));
             }
 
-            if(planStatus.equals("enable")){
+            if (planStatus.equals("enable")) {
                 statusBtn.setText("DISABLE");
-            }else if( planStatus.equals("disable")){
+            } else if (planStatus.equals("disable")) {
                 statusBtn.setText("ENABLE");
             }
 
@@ -105,7 +106,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.MyViewHolder> 
                             "Yes",
                             new DialogInterface.OnClickListener() {
                                 @RequiresApi(api = Build.VERSION_CODES.O)
-                                public void onClick(DialogInterface dialog, int mid) {
+                                public void onClick(@NonNull DialogInterface dialog, int mid) {
                                     PlansFragment.changeStatus(id, planStatus);
                                     dialog.cancel();
                                 }
@@ -114,7 +115,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.MyViewHolder> 
                     builder1.setNegativeButton(
                             "No",
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
+                                public void onClick(@NonNull DialogInterface dialog, int id) {
                                     dialog.cancel();
                                 }
                             });

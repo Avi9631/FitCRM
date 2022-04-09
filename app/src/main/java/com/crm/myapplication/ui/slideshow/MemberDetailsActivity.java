@@ -14,10 +14,10 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,28 +25,24 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.crm.myapplication.DataList;
-import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.R;
 import com.crm.myapplication.ui.payfee.PayFeeActivity;
-import com.crm.myapplication.Models.Member;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class MemberDetailsActivity extends AppCompatActivity {
 
-    Member member=null;
+    @Nullable
+    Member member = null;
     ImageView v1, v2;
-String dobstr;
-    Button call, payFee, msg, idCard, delete, block, edit , addDays;
+    String dobstr;
+    Button call, payFee, msg, idCard, delete, block, edit, addDays;
 
     Dialog loadingDialog;
 
@@ -60,117 +56,116 @@ String dobstr;
         setSupportActionBar(toolbar);
         toolbar.setTitle("Member Details");
 
-        call= findViewById(R.id.button3);
-        payFee= findViewById(R.id.button5);
-        msg= findViewById(R.id.button4);
+        call = findViewById(R.id.button3);
+        payFee = findViewById(R.id.button5);
+        msg = findViewById(R.id.button4);
         msg.setVisibility(View.GONE);
-        idCard= findViewById(R.id.button6);
-        edit= findViewById(R.id.button9);
-        block= findViewById(R.id.button10);
-        delete= findViewById(R.id.button11);
-        addDays= findViewById(R.id.button12);
+        idCard = findViewById(R.id.button6);
+        edit = findViewById(R.id.button9);
+        block = findViewById(R.id.button10);
+        delete = findViewById(R.id.button11);
+        addDays = findViewById(R.id.button12);
 
-        loadingDialog= new Dialog(MemberDetailsActivity.this);
+        loadingDialog = new Dialog(MemberDetailsActivity.this);
         loadingDialog.setContentView(R.layout.loading);
         loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
         loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         loadingDialog.setCancelable(false);
 
-        v1= findViewById(R.id.imageView2);
-        v2= findViewById(R.id.imageView3);
+        v1 = findViewById(R.id.imageView2);
+        v2 = findViewById(R.id.imageView3);
 
-         member= DataList.memberList.stream()
-                .filter(c-> c.getId().equals(getIntent().getStringExtra("id")))
+        member = DataList.memberList.stream()
+                .filter(c -> c.getId().equals(getIntent().getStringExtra("id")))
                 .findAny()
                 .orElse(null);
 
-                loaded();
+        loaded();
 
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void loaded(){
-        if(member
+    public void loaded() {
+        if (member
                 .getStatus()
-                .equals("blocked")){
+                .equals("blocked")) {
             block.setText("UNBLOCK");
-        }else{
+        } else {
             block.setText("BLOCK");
         }
 
         Glide.with(this).load(member.getPicurl()).into(v1);
         Glide.with(this).load(member.getDocurl()).into(v2);
 
-        DateTimeFormatter ft= DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter ft = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        if(!member.getDob().trim().equals("")) {
+        if (!member.getDob().trim().equals("")) {
             ZonedDateTime l1 = ZonedDateTime.parse(member.getDob());
             DateTimeFormatter ft1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            dobstr= (ft1.format(l1).toString());
-        }else{
-            dobstr= member.getDob();
+            dobstr = (ft1.format(l1));
+        } else {
+            dobstr = member.getDob();
         }
 
         String content = "<p><b>Name : </b>" +
                 member.getName() +
-                "</p>"+
+                "</p>" +
                 "<p><b>ID : </b>" +
                 member.getId() +
-                "</p>"+
+                "</p>" +
                 "<p><b>Join Date : </b>" +
-                ft.format(ZonedDateTime.parse(member.getJoindate())).toString() +
-                "</p>"+
-                "</p>"+
+                ft.format(ZonedDateTime.parse(member.getJoindate())) +
+                "</p>" +
+                "</p>" +
                 "<p><b>Exp Date : </b>" +
-                ft.format(ZonedDateTime.parse(member.getExpdate())).toString() +
-                "</p>"+
-                "</p>"+
+                ft.format(ZonedDateTime.parse(member.getExpdate())) +
+                "</p>" +
+                "</p>" +
                 "<p><b>Mobile : </b>" +
                 member.getMob() +
-                "</p>"+
-                "</p>"+
+                "</p>" +
+                "</p>" +
                 "<p><b>Email : </b>" +
                 member.getEmail() +
-                "</p>"+
-                "</p>"+
+                "</p>" +
+                "</p>" +
                 "<p><b>Address : </b>" +
                 member.getAddress() +
-                "</p>"+
-                "</p>"+
+                "</p>" +
+                "</p>" +
                 "<p><b>Gender : </b>" +
                 member.getGender() +
-                "</p>"+
+                "</p>" +
                 "<p><b>DOB : </b>" +
                 dobstr +
-                "</p>"+
+                "</p>" +
                 "<p><b>Batch : </b>" +
-                member.getBatchname()+
-                "</p>"+
+                member.getBatchname() +
+                "</p>" +
                 "<p><b>Gender : </b>" +
                 member.getGender() +
-                "</p>"+
+                "</p>" +
                 "<p><b>Last Fee Pay Date : </b>" +
-                ft.format(ZonedDateTime.parse(member.getFeepaydate())).toString() +
-                "</p>"+
+                ft.format(ZonedDateTime.parse(member.getFeepaydate())) +
+                "</p>" +
                 "<p><b>Member Details : </b>" +
                 member.getDetails() +
-                "</p>"+
+                "</p>" +
                 "<p><b>Member Status : </b>" +
                 member.getStatus() +
-                "</p>"+
-        "<p><b>Member Image : </b>" +
-                "<a href="+member.getPicurl()+">"+member.getPicurl() +
-                "</a></p>"+
-        "<p><b>Member Document Image : </b>" +
-                "<a href="+member.getDocurl()+">"+member.getDocurl() +
-                "</a></p>"
-                ;
-        WebView wb= findViewById(R.id.webview);
+                "</p>" +
+                "<p><b>Member Image : </b>" +
+                "<a href=" + member.getPicurl() + ">" + member.getPicurl() +
+                "</a></p>" +
+                "<p><b>Member Document Image : </b>" +
+                "<a href=" + member.getDocurl() + ">" + member.getDocurl() +
+                "</a></p>";
+        WebView wb = findViewById(R.id.webview);
 
         // disable scroll on touch
         wb.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
+            public boolean onTouch(View v, @NonNull MotionEvent event) {
                 return (event.getAction() == MotionEvent.ACTION_MOVE);
             }
         });
@@ -209,11 +204,11 @@ String dobstr;
         block.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(member
+                if (member
                         .getStatus()
                         .equals("blocked"))
                     showAlert("Are you sure you want to block member?", "active");
-                else{
+                else {
                     showAlert("Are you sure you want to unblock member?", "block");
                 }
             }
@@ -234,7 +229,7 @@ String dobstr;
         });
     }
 
-    public void showAlert( String s, String m){
+    public void showAlert(String s, @NonNull String m) {
         AlertDialog.Builder builder1 = new AlertDialog.Builder(MemberDetailsActivity.this);
         builder1.setMessage(s);
         builder1.setCancelable(true);
@@ -245,7 +240,7 @@ String dobstr;
                     @RequiresApi(api = Build.VERSION_CODES.O)
                     public void onClick(DialogInterface dialog, int id) {
                         Intent i;
-                        switch(m){
+                        switch (m) {
                             case "call":
 //                                i= new Intent(Intent.ACTION_CALL);
 //                                i.setData(Uri.parse("tel:"+member.getMob()));
@@ -253,7 +248,7 @@ String dobstr;
                                 callAtRuntime();
                                 break;
                             case "payfee":
-                                i=new Intent(MemberDetailsActivity.this, PayFeeActivity.class);
+                                i = new Intent(MemberDetailsActivity.this, PayFeeActivity.class);
                                 i.putExtra("member", member);
                                 i.putExtra("position", getIntent().getIntExtra("position", -1));
                                 i.putExtra("id", id);
@@ -275,7 +270,7 @@ String dobstr;
                                         .child("status").setValue("trashed").addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        if(task.isSuccessful()){
+                                        if (task.isSuccessful()) {
                                             Toast.makeText(MemberDetailsActivity.this, "Member Moved to Trash", Toast.LENGTH_SHORT).show();
                                         }
                                     }
@@ -292,7 +287,7 @@ String dobstr;
                                         .child("status").setValue("blocked").addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        if(task.isSuccessful()){
+                                        if (task.isSuccessful()) {
                                             Toast.makeText(MemberDetailsActivity.this, "Member Moved to Blocked List", Toast.LENGTH_SHORT).show();
                                         }
                                         loadingDialog.dismiss();
@@ -310,7 +305,7 @@ String dobstr;
                                         .child("status").setValue("active").addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        if(task.isSuccessful()){
+                                        if (task.isSuccessful()) {
                                             Toast.makeText(MemberDetailsActivity.this, "Member Moved to Active List", Toast.LENGTH_SHORT).show();
                                         }
                                         loadingDialog.dismiss();
@@ -335,7 +330,7 @@ String dobstr;
         builder1.setNegativeButton(
                 "No",
                 new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+                    public void onClick(@NonNull DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
                 });
@@ -344,15 +339,14 @@ String dobstr;
         alert11.show();
     }
 
-    public void callAtRuntime(){
+    public void callAtRuntime() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                 && checkSelfPermission(Manifest.permission.CALL_PHONE)
-                != PackageManager.PERMISSION_GRANTED){
+                != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CALL_PHONE}, 1);
-        }
-        else {
+        } else {
             Intent intent = new Intent(Intent.ACTION_CALL);
-            intent.setData(Uri.parse("tel:"+member.getMob()));
+            intent.setData(Uri.parse("tel:" + member.getMob()));
             startActivity(intent);
         }
     }
@@ -364,7 +358,7 @@ String dobstr;
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 callAtRuntime();
             } else {
-                Toast.makeText(this, "Oh No !!!Permission Denied.Try Again !",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Oh No !!!Permission Denied.Try Again !", Toast.LENGTH_SHORT).show();
             }
         }
     }

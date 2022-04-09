@@ -77,7 +77,7 @@ public class ProfileActivity extends AppCompatActivity {
                     builder1.setPositiveButton(
                             "Yes",
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
+                                public void onClick(@NonNull DialogInterface dialog, int id) {
                                     saveToDB();
                                     dialog.cancel();
                                 }
@@ -86,7 +86,7 @@ public class ProfileActivity extends AppCompatActivity {
                     builder1.setNegativeButton(
                             "No",
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
+                                public void onClick(@NonNull DialogInterface dialog, int id) {
                                     dialog.cancel();
                                 }
                             });

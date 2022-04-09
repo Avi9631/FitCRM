@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,7 +24,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.crm.myapplication.Adapters.MemberAdapter;
 import com.crm.myapplication.DataList;
-import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -48,10 +48,19 @@ public class ViewMemberFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    RecyclerView view;
+    @NonNull
+    String[] courses = {"All", "Active Members", "Expired Members",
+            "Expire Today", "Expire 1-5", "Expire 6-10", "Expire 11-15", "Blocked Members", "Deleted Members"
+    };
+    @Nullable
+    Dialog loadingDialog;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
+    @Nullable
+    private MemberAdapter memberAdapter;
+    private EditText search;
     public ViewMemberFragment() {
         // Required empty public constructor
     }
@@ -65,6 +74,7 @@ public class ViewMemberFragment extends Fragment {
      * @return A new instance of fragment ViewMemberFragment.
      */
     // TODO: Rename and change types and number of parameters
+    @NonNull
     public static ViewMemberFragment newInstance(String param1, String param2) {
         ViewMemberFragment fragment = new ViewMemberFragment();
         Bundle args = new Bundle();
@@ -83,23 +93,13 @@ public class ViewMemberFragment extends Fragment {
         }
     }
 
-
-    RecyclerView view;
-    String[] courses = {"All","Active Members", "Expired Members",
-            "Expire Today", "Expire 1-5", "Expire 6-10", "Expire 11-15", "Blocked Members", "Deleted Members"
-            };
-    private MemberAdapter memberAdapter;
-    private EditText search;
-
-    Dialog loadingDialog;
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_view_member, container, false);
 
-        loadingDialog= new Dialog(getContext());
+        loadingDialog = new Dialog(getContext());
         loadingDialog.setContentView(R.layout.loading);
         loadingDialog.getWindow().setBackgroundDrawable(getContext().getDrawable(R.drawable.rounded_corners));
         loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -107,7 +107,7 @@ public class ViewMemberFragment extends Fragment {
 
         view = v.findViewById(R.id.rec1);
         Spinner spin = v.findViewById(R.id.spinner2);
-        search= v.findViewById(R.id.searchView);
+        search = v.findViewById(R.id.searchView);
 
         LinearLayoutManager l = new LinearLayoutManager(getContext());
         l.setOrientation(RecyclerView.VERTICAL);
@@ -115,7 +115,7 @@ public class ViewMemberFragment extends Fragment {
         view.setHasFixedSize(true);
         view.setNestedScrollingEnabled(false);
 
-        if(DataList.memberList.size()>0){
+        if (DataList.memberList.size() > 0) {
             DataList.memberList.clear();
         }
 
@@ -128,8 +128,8 @@ public class ViewMemberFragment extends Fragment {
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for(DataSnapshot d: snapshot.getChildren()){
-                            if(!String.valueOf(d.child("status")).equals("trashed")) {
+                        for (DataSnapshot d : snapshot.getChildren()) {
+                            if (!String.valueOf(d.child("status")).equals("trashed")) {
                                 DataList.memberList.add(new Member(
                                         String.valueOf(d.child("name").getValue()),
                                         String.valueOf(d.child("id").getValue()),
@@ -158,7 +158,7 @@ public class ViewMemberFragment extends Fragment {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-loadingDialog.dismiss();
+                        loadingDialog.dismiss();
                     }
                 });
 
@@ -192,7 +192,7 @@ loadingDialog.dismiss();
             }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public void onTextChanged(@NonNull CharSequence charSequence, int i, int i1, int i2) {
                 memberAdapter.getFilter().filter(charSequence.toString());
             }
 
@@ -207,9 +207,9 @@ loadingDialog.dismiss();
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void filter(final String st){
+    public void filter(@NonNull final String st) {
 //        "Unpaid Members", "Inactive Members", "Expired Members",
-        switch(st) {
+        switch (st) {
 
             case "All":
                 Toast.makeText(getContext(), "all", Toast.LENGTH_SHORT).show();
@@ -220,14 +220,14 @@ loadingDialog.dismiss();
 
             case "Active Members":
                 Toast.makeText(getContext(), "activr mem kkk", Toast.LENGTH_SHORT).show();
-            memberAdapter = new MemberAdapter(getContext(),
-                    DataList.memberList
-                            .stream()
-                            .filter(m -> m.getStatus().equals("active"))
-                            .collect(Collectors.toList()));
-            view.setAdapter(memberAdapter);
-            memberAdapter.notifyDataSetChanged();
-            break;
+                memberAdapter = new MemberAdapter(getContext(),
+                        DataList.memberList
+                                .stream()
+                                .filter(m -> m.getStatus().equals("active"))
+                                .collect(Collectors.toList()));
+                view.setAdapter(memberAdapter);
+                memberAdapter.notifyDataSetChanged();
+                break;
 
             case "Blocked Members":
                 memberAdapter = new MemberAdapter(getContext(),
@@ -303,43 +303,38 @@ loadingDialog.dismiss();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public boolean checkToday(String expdate){
-        ZonedDateTime t= ZonedDateTime.parse(expdate);
-        Duration d= Duration.between(t, ZonedDateTime.now(ZoneId.of("Asia/Kolkata"))) ;
+    public boolean checkToday(String expdate) {
+        ZonedDateTime t = ZonedDateTime.parse(expdate);
+        Duration d = Duration.between(t, ZonedDateTime.now(ZoneId.of("Asia/Kolkata")));
 //        (t.getDayOfMonth() == ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).getDayOfMonth())
 //                && t.getMonthValue() == ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).getMonthValue()
 //                && t.getYear() == ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).getYear()
-        if(d.toDays() == 0){
+        if (d.toDays() == 0) {
             Toast.makeText(getContext(), String.valueOf(d.toDays()), Toast.LENGTH_SHORT).show();
             return true;
-        }else{
+        } else {
             Toast.makeText(getContext(), "not exp today", Toast.LENGTH_SHORT).show();
             return false;
         }
     }
 
 
-
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public boolean checka(String expdate,long p, long q){
-        ZonedDateTime t= ZonedDateTime.parse(expdate);
-        Duration d= Duration.between(t, ZonedDateTime.now(ZoneId.of("Asia/Kolkata"))) ;
+    public boolean checka(String expdate, long p, long q) {
+        ZonedDateTime t = ZonedDateTime.parse(expdate);
+        Duration d = Duration.between(t, ZonedDateTime.now(ZoneId.of("Asia/Kolkata")));
         Toast.makeText(getContext(), String.valueOf(d.toDays()), Toast.LENGTH_SHORT).show();
-        if(d.toDays() <= q && d.toDays()>=p){
-            return true;
-        }else{
-            return false;
-        }
+        return d.toDays() <= q && d.toDays() >= p;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public boolean checkexp(String expdate){
-        ZonedDateTime t= ZonedDateTime.parse(expdate);
-        Duration d= Duration.between(t, ZonedDateTime.now(ZoneId.of("Asia/Kolkata"))) ;
-        if(d.toDays()>=0){
+    public boolean checkexp(String expdate) {
+        ZonedDateTime t = ZonedDateTime.parse(expdate);
+        Duration d = Duration.between(t, ZonedDateTime.now(ZoneId.of("Asia/Kolkata")));
+        if (d.toDays() >= 0) {
             Toast.makeText(getContext(), String.valueOf(d.toDays()), Toast.LENGTH_SHORT).show();
             return true;
-        }else{
+        } else {
             Toast.makeText(getContext(), "exp mem", Toast.LENGTH_SHORT).show();
             return false;
         }

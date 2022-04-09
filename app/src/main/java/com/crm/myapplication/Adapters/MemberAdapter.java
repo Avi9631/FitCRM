@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,10 +27,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MemberAdapter extends RecyclerView.Adapter<MemberAdapter.MyViewHolder>  implements Filterable {
+public class MemberAdapter extends RecyclerView.Adapter<MemberAdapter.MyViewHolder> implements Filterable {
 
-    private Context mContext;
-    List<Member> mData ;
+    private final Context mContext;
+    List<Member> mData;
     List<Member> filterList;
     CustomFilter4 filter;
 
@@ -50,17 +51,17 @@ public class MemberAdapter extends RecyclerView.Adapter<MemberAdapter.MyViewHold
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        String name=  mData.get(position).getName();
-        String id=   mData.get(position).getId();
-        String joindate=  mData.get(position).getJoindate();
-        String expdate=   mData.get(position).getExpdate();
-        String mob=  mData.get(position).getMob();
-        String email=   mData.get(position).getEmail();
-        String address=   mData.get(position).getAddress();
-        String gender=   mData.get(position).getGender();
-        String dob=   mData.get(position).getDob();
-        String status=   mData.get(position).getStatus();
-        String batch= mData.get(position).getBatchname();
+        String name = mData.get(position).getName();
+        String id = mData.get(position).getId();
+        String joindate = mData.get(position).getJoindate();
+        String expdate = mData.get(position).getExpdate();
+        String mob = mData.get(position).getMob();
+        String email = mData.get(position).getEmail();
+        String address = mData.get(position).getAddress();
+        String gender = mData.get(position).getGender();
+        String dob = mData.get(position).getDob();
+        String status = mData.get(position).getStatus();
+        String batch = mData.get(position).getBatchname();
         holder.setData(name, id, joindate, expdate, mob, email, address, gender, dob, position, batch, status);
 
     }
@@ -80,15 +81,21 @@ public class MemberAdapter extends RecyclerView.Adapter<MemberAdapter.MyViewHold
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
+        private final ImageView propic;
+        private final TextView name;
+        private final TextView id;
+        private final TextView batch;
+        private final TextView expdate;
+        private final TextView gender;
+        private final TextView mobile;
+        private final TextView status;
+        private final Button detailsBtn;
+        private final Button payFeeBtn;
         TextView serviceName, servicePrice, serviceBID, serviceProb1, serviceAddress, serviceStatus;
         Button accept, decline, details;
 
-        private ImageView propic;
-        private TextView name, id, batch, expdate, gender, mobile, status;
-        private Button detailsBtn, payFeeBtn;
 
-
-        public MyViewHolder(View itemView) {
+        public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             propic = itemView.findViewById(R.id.imageView6);
             name = itemView.findViewById(R.id.textView13);
@@ -109,21 +116,21 @@ public class MemberAdapter extends RecyclerView.Adapter<MemberAdapter.MyViewHold
                             String address, String gender, String dob,
                             int position, String batch, String status) {
 
-            this.name.setText("Name : "+name);
-            this.id.setText("ID : "+id);
-            this.mobile.setText("Mobile No. : "+mob);
+            this.name.setText("Name : " + name);
+            this.id.setText("ID : " + id);
+            this.mobile.setText("Mobile No. : " + mob);
             this.status.setText(status);
             this.batch.setText("Batch : " + batch);
-            DateTimeFormatter ft= DateTimeFormatter.ofPattern("dd/MM/uuuu");
-            ZonedDateTime z= ZonedDateTime.parse(expdate);
-            String d=  ft.format(z).toString();
-            this.expdate.setText("Exp Date : "+ d);
-            this.gender.setText("Gender : "+gender);
+            DateTimeFormatter ft = DateTimeFormatter.ofPattern("dd/MM/uuuu");
+            ZonedDateTime z = ZonedDateTime.parse(expdate);
+            String d = ft.format(z);
+            this.expdate.setText("Exp Date : " + d);
+            this.gender.setText("Gender : " + gender);
 
             detailsBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent i=new Intent(mContext, MemberDetailsActivity.class);
+                    Intent i = new Intent(mContext, MemberDetailsActivity.class);
                     i.putExtra("position", position);
                     i.putExtra("id", id);
                     mContext.startActivity(i);
@@ -133,7 +140,7 @@ public class MemberAdapter extends RecyclerView.Adapter<MemberAdapter.MyViewHold
             payFeeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent i=new Intent(mContext, PayFeeActivity.class);
+                    Intent i = new Intent(mContext, PayFeeActivity.class);
                     i.putExtra("position", position);
                     i.putExtra("id", id);
                     i.putExtra("member", mData.get(position));
@@ -152,36 +159,36 @@ class CustomFilter4 extends Filter {
     List<Member> filterList;
 
     public CustomFilter4(List<Member> filterList, MemberAdapter userAdapter) {
-        this.adapter=userAdapter;
-        this.filterList= filterList;
+        this.adapter = userAdapter;
+        this.filterList = filterList;
     }
 
+    @NonNull
     @Override
-    protected FilterResults performFiltering(CharSequence constraint) {
-        FilterResults filterResults=new FilterResults();
-        if(constraint!=null || constraint.length()>0){
-            constraint=constraint.toString().toLowerCase();
-            List<Member> list= new ArrayList<>();
-            for(int i=0; i<filterList.size(); i++){
-                if(filterList.get(i).getName().toLowerCase().contains(constraint)){
+    protected FilterResults performFiltering(@Nullable CharSequence constraint) {
+        FilterResults filterResults = new FilterResults();
+        if (constraint != null || constraint.length() > 0) {
+            constraint = constraint.toString().toLowerCase();
+            List<Member> list = new ArrayList<>();
+            for (int i = 0; i < filterList.size(); i++) {
+                if (filterList.get(i).getName().toLowerCase().contains(constraint)) {
                     list.add(filterList.get(i));
-                }
-                else if(filterList.get(i).getMob().toLowerCase().contains(constraint)) {
+                } else if (filterList.get(i).getMob().toLowerCase().contains(constraint)) {
                     list.add(filterList.get(i));
                 }
             }
-            filterResults.count= list.size();
-            filterResults.values= list;
-        }else {
-            filterResults.count= filterList.size();
-            filterResults.values= filterList;
+            filterResults.count = list.size();
+            filterResults.values = list;
+        } else {
+            filterResults.count = filterList.size();
+            filterResults.values = filterList;
         }
         return filterResults;
     }
 
     @Override
-    protected void publishResults(CharSequence constraint, FilterResults results) {
-        adapter.mData= (List<Member>) results.values;
+    protected void publishResults(CharSequence constraint, @NonNull FilterResults results) {
+        adapter.mData = (List<Member>) results.values;
         adapter.notifyDataSetChanged();
     }
 

@@ -16,7 +16,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Plan;
 import com.crm.myapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -51,7 +50,7 @@ public class PlanActivity extends AppCompatActivity {
         RadioButton day = (RadioButton) findViewById(R.id.radioButton);
         RadioButton month = (RadioButton) findViewById(R.id.radioButton2);
 
-        loadingDialog= new Dialog(PlanActivity.this);
+        loadingDialog = new Dialog(PlanActivity.this);
         loadingDialog.setContentView(R.layout.loading);
         loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
         loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -82,9 +81,9 @@ public class PlanActivity extends AppCompatActivity {
                             "Yes",
                             new DialogInterface.OnClickListener() {
                                 @RequiresApi(api = Build.VERSION_CODES.O)
-                                public void onClick(DialogInterface dialog, int id) {
-loadingDialog.show();
-                                    String pid= UUID.randomUUID().toString();
+                                public void onClick(@NonNull DialogInterface dialog, int id) {
+                                    loadingDialog.show();
+                                    String pid = UUID.randomUUID().toString();
                                     FirebaseDatabase.getInstance().getReference()
                                             .child("FITCRM")
                                             .child("gyms")
@@ -96,7 +95,7 @@ loadingDialog.show();
                                                     fee.getText().toString(),
                                                     duration.getText().toString(),
                                                     finalDurationType,
-                                                    desc.getText().toString(), "enable" ,
+                                                    desc.getText().toString(), "enable",
                                                     ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toString()))
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
@@ -112,7 +111,7 @@ loadingDialog.show();
                     builder1.setNegativeButton(
                             "No",
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
+                                public void onClick(@NonNull DialogInterface dialog, int id) {
                                     dialog.cancel();
                                 }
                             });

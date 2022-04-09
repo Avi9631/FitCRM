@@ -1,9 +1,7 @@
 package com.crm.myapplication;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,20 +29,21 @@ public class SplashScreenActivity extends AppCompatActivity {
 //        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 //        loadingDialog.setCancelable(false);
 
-        if(FirebaseAuth.getInstance().getCurrentUser()!=null){
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             loadFromDB();
-        }else{
+        } else {
             Intent i = new Intent(SplashScreenActivity.this, LoginActivity.class);
-            startActivity(i);finish();
+            startActivity(i);
+            finish();
         }
 
     }
 
-    public void loadFromDB(){
-        if(DataList.batchList.size()>0){
+    public void loadFromDB() {
+        if (DataList.batchList.size() > 0) {
             DataList.batchList.clear();
         }
-        if(DataList.planList.size()>0){
+        if (DataList.planList.size() > 0) {
             DataList.planList.clear();
         }
         FirebaseDatabase.getInstance().getReference()
@@ -55,7 +54,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for(DataSnapshot d: snapshot.getChildren()){
+                        for (DataSnapshot d : snapshot.getChildren()) {
                             DataList.batchList.add(new Batch(
                                     String.valueOf(d.child("batchid").getValue()),
                                     String.valueOf(d.child("batchname").getValue()),
@@ -76,7 +75,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                                        for(DataSnapshot d: snapshot.getChildren()){
+                                        for (DataSnapshot d : snapshot.getChildren()) {
                                             DataList.planList.add(new Plan(
                                                     String.valueOf(d.child("planid").getValue()),
                                                     String.valueOf(d.child("planname").getValue()),
@@ -89,7 +88,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                                             ));
                                         }
                                         Intent i = new Intent(SplashScreenActivity.this, MainActivity.class);
-                                        startActivity(i);finish();
+                                        startActivity(i);
+                                        finish();
                                     }
 
                                     @Override

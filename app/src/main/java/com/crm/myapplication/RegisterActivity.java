@@ -22,11 +22,10 @@ import com.google.firebase.auth.FirebaseAuth;
 public class RegisterActivity extends AppCompatActivity {
 
 
+    FirebaseAuth mAuth;
     private LinearLayout l1, l2;
     private EditText email, pass, confirmpass;
     private Button btn1;
-    FirebaseAuth mAuth;
-
     private Dialog loadingDialog;
 
     @Override
@@ -34,14 +33,14 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        mAuth= FirebaseAuth.getInstance();
-        l1= findViewById(R.id.loginlinlay);
-        email= findViewById(R.id.email);
-        pass= findViewById(R.id.pass);
-        confirmpass= findViewById(R.id.confirmpass);
-        btn1= findViewById(R.id.btn1);
+        mAuth = FirebaseAuth.getInstance();
+        l1 = findViewById(R.id.loginlinlay);
+        email = findViewById(R.id.email);
+        pass = findViewById(R.id.pass);
+        confirmpass = findViewById(R.id.confirmpass);
+        btn1 = findViewById(R.id.btn1);
 
-        loadingDialog= new Dialog(RegisterActivity.this);
+        loadingDialog = new Dialog(RegisterActivity.this);
         loadingDialog.setContentView(R.layout.loading);
         loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
         loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -51,13 +50,13 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!TextUtils.isEmpty(email.getText().toString())) {
-                    if(!TextUtils.isEmpty(pass.getText().toString())){
-                        if(pass.getText().toString().equals(confirmpass.getText().toString())){
+                    if (!TextUtils.isEmpty(pass.getText().toString())) {
+                        if (pass.getText().toString().equals(confirmpass.getText().toString())) {
                             logup();
-                        }else {
+                        } else {
                             Toast.makeText(RegisterActivity.this, "Password do not match", Toast.LENGTH_SHORT).show();
                         }
-                    }else{
+                    } else {
                         Toast.makeText(RegisterActivity.this, "Please enter a valid password.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
@@ -67,19 +66,19 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    private void logup(){
+    private void logup() {
         loadingDialog.show();
         mAuth.createUserWithEmailAndPassword(email.getText().toString().trim(), pass.getText().toString().trim())
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-                            Intent i=new Intent(RegisterActivity.this, ProfileActivity.class);
+                        if (task.isSuccessful()) {
+                            Intent i = new Intent(RegisterActivity.this, ProfileActivity.class);
                             i.putExtra("email", email.getText().toString());
                             startActivity(i);
                             finish();
                             loadingDialog.dismiss();
-                        }else{
+                        } else {
                             loadingDialog.dismiss();
                             Toast.makeText(RegisterActivity.this, "Cannot be registered", Toast.LENGTH_SHORT).show();
                         }

@@ -21,13 +21,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.crm.myapplication.DataList;
-import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.MainActivity;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.Models.MemberFee;
@@ -57,22 +57,21 @@ import java.util.stream.Collectors;
 
 public class AdmissionActivity extends AppCompatActivity {
 
+    private final List<Plan> enableList = DataList.planList
+            .stream().filter(m -> m.getStatus().equals("enable")).collect(Collectors.toList());
+    private final String[] arr = new String[enableList.size()];
     Spinner spin;
     double total;
     double a, b, c, d;
-    private TextView name, payScale, admsnFeeTxt, feeTxt, taxTxt, tot, discText;
-    private Button submit;
-    private EditText admsnFee, discFee, tax;
-
-    private List<Plan> enableList= DataList.planList
-            .stream().filter(m -> m.getStatus().equals("enable")).collect(Collectors.toList());
-    private Plan p=null;
-    private String arr[]=new String[enableList.size()];
     Uri uripro, uridoc;
     FirebaseStorage storage;
     StorageReference storageReference;
-
     Dialog loadingDialog;
+    private TextView name, payScale, admsnFeeTxt, feeTxt, taxTxt, tot, discText;
+    private Button submit;
+    private EditText admsnFee, discFee, tax;
+    @Nullable
+    private Plan p = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,24 +82,25 @@ public class AdmissionActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle("Member Admission");
 
-        int k=0;
-        for(Plan b: enableList){
-            if(b.getStatus().equals("enable")) {
-                arr[k] = b.getPlanname(); k++;
+        int k = 0;
+        for (Plan b : enableList) {
+            if (b.getStatus().equals("enable")) {
+                arr[k] = b.getPlanname();
+                k++;
             }
         }
 
-        loadingDialog= new Dialog(AdmissionActivity.this);
+        loadingDialog = new Dialog(AdmissionActivity.this);
         loadingDialog.setContentView(R.layout.loading);
         loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
         loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         loadingDialog.setCancelable(false);
 
         Member m = (Member) getIntent().getSerializableExtra("member");
-        if(AddMemberFragment.uripro !=null)
-        uripro = Uri.parse(getIntent().getStringExtra("uripro"));
-        if(AddMemberFragment.uridoc !=null)
-        uridoc = Uri.parse(getIntent().getStringExtra("uridoc"));
+        if (AddMemberFragment.uripro != null)
+            uripro = Uri.parse(getIntent().getStringExtra("uripro"));
+        if (AddMemberFragment.uridoc != null)
+            uridoc = Uri.parse(getIntent().getStringExtra("uridoc"));
 
         // get the Firebase  storage reference
         storage = FirebaseStorage.getInstance();
@@ -130,7 +130,7 @@ public class AdmissionActivity extends AppCompatActivity {
 
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public void onTextChanged(@NonNull CharSequence charSequence, int i, int i1, int i2) {
                 if (!charSequence.toString().equals("")) {
                     d = Double.parseDouble(charSequence.toString());
                 } else {
@@ -153,7 +153,7 @@ public class AdmissionActivity extends AppCompatActivity {
 
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public void onTextChanged(@NonNull CharSequence charSequence, int i, int i1, int i2) {
                 if (!charSequence.toString().equals("")) {
                     a = Double.parseDouble(charSequence.toString());
                 } else {
@@ -176,7 +176,7 @@ public class AdmissionActivity extends AppCompatActivity {
 
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public void onTextChanged(@NonNull CharSequence charSequence, int i, int i1, int i2) {
                 if (!charSequence.toString().equals("")) {
                     b = Double.parseDouble(charSequence.toString());
                 } else {
@@ -199,7 +199,7 @@ public class AdmissionActivity extends AppCompatActivity {
                         arr[i],
                         Toast.LENGTH_LONG)
                         .show();
-                p= enableList.get(i);
+                p = enableList.get(i);
                 c = Double.parseDouble(enableList.get(i).getPlanfee());
                 setData(m);
             }
@@ -221,7 +221,7 @@ public class AdmissionActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
-                if(total>0  && p!=null){
+                if (total > 0 && p != null) {
                     AlertDialog.Builder builder1 = new AlertDialog.Builder(AdmissionActivity.this);
                     builder1.setMessage("Are you sure to add a member?");
                     builder1.setCancelable(true);
@@ -231,20 +231,20 @@ public class AdmissionActivity extends AppCompatActivity {
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
 
-                                    ZonedDateTime l= ZonedDateTime.parse(m.getJoindate());
+                                    ZonedDateTime l = ZonedDateTime.parse(m.getJoindate());
                                     ZonedDateTime l1 = null;
-                                    if(p.getPlandurationtype().equals("Month")){
-                                       l1= l.plusMonths(Long.parseLong(p.getPlanduration()));
-                                    }else if(p.getPlandurationtype().equals("Day")){
-                                        l1= l.plusDays(Long.parseLong(p.getPlanduration()));
+                                    if (p.getPlandurationtype().equals("Month")) {
+                                        l1 = l.plusMonths(Long.parseLong(p.getPlanduration()));
+                                    } else if (p.getPlandurationtype().equals("Day")) {
+                                        l1 = l.plusDays(Long.parseLong(p.getPlanduration()));
                                     }
                                     m.setFeepaydate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
                                     m.setExpdate(l1.toString());
 //                                    DataList.memberList.add(m);
 
-                                    String mid= UUID.randomUUID().toString();
+                                    String mid = UUID.randomUUID().toString();
                                     m.setId(mid);
-                                   uploadImage(m);
+                                    uploadImage(m);
 
 //                                    Intent i= new Intent(AdmissionActivity.this, MainActivity.class);
 //                                    startActivity(i);
@@ -254,14 +254,14 @@ public class AdmissionActivity extends AppCompatActivity {
                     builder1.setNegativeButton(
                             "No",
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
+                                public void onClick(@NonNull DialogInterface dialog, int id) {
                                     dialog.cancel();
                                 }
                             });
 
                     AlertDialog alert11 = builder1.create();
                     alert11.show();
-                }else {
+                } else {
                     Toast.makeText(AdmissionActivity.this, "Invalid Data", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -269,32 +269,32 @@ public class AdmissionActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void setData(Member m) {
+    public void setData(@NonNull Member m) {
         admsnFeeTxt.setText("Admission : Rs." + a + "/-");
         feeTxt.setText("Fee : Rs." + c + "/-");
         taxTxt.setText("Tax : Rs." + b + "/-");
         discText.setText("Disc : Rs." + d + "/-");
         total = (a + b + c) - d;
         tot.setText("Tot Amt to be Paid : Rs." + total + "/-");
-        if(p==null){
+        if (p == null) {
             payScale.setText("Pay Scale: ");
-        }else{
-            ZonedDateTime l= ZonedDateTime.parse(m.getJoindate());
+        } else {
+            ZonedDateTime l = ZonedDateTime.parse(m.getJoindate());
             ZonedDateTime l1 = null;
-            if(p.getPlandurationtype().equals("Month")){
-                l1= l.plusMonths(Long.parseLong(p.getPlanduration()));
-            }else if(p.getPlandurationtype().equals("Day")){
-                l1= l.plusDays(Long.parseLong(p.getPlanduration()));
+            if (p.getPlandurationtype().equals("Month")) {
+                l1 = l.plusMonths(Long.parseLong(p.getPlanduration()));
+            } else if (p.getPlandurationtype().equals("Day")) {
+                l1 = l.plusDays(Long.parseLong(p.getPlanduration()));
             }
 
-            DateTimeFormatter ft= DateTimeFormatter.ofPattern("dd/MM/uuuu");
+            DateTimeFormatter ft = DateTimeFormatter.ofPattern("dd/MM/uuuu");
 
-            payScale.setText("Pay Scale: "+ft.format(l).toString()+" To "+ft.format(l1).toString());
+            payScale.setText("Pay Scale: " + ft.format(l) + " To " + ft.format(l1));
         }
     }
 
 
-    private void uploadData(Member m){
+    private void uploadData(@NonNull Member m) {
         loadingDialog.show();
         FirebaseDatabase.getInstance().getReference()
                 .child("FITCRM")
@@ -306,7 +306,7 @@ public class AdmissionActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()){
+                if (task.isSuccessful()) {
 
                     FirebaseDatabase.getInstance().getReference()
                             .child("FITCRM")
@@ -328,7 +328,7 @@ public class AdmissionActivity extends AppCompatActivity {
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    if(task.isSuccessful()){
+                                    if (task.isSuccessful()) {
 
                                         FirebaseDatabase.getInstance().getReference()
                                                 .child("FITCRM")
@@ -340,11 +340,11 @@ public class AdmissionActivity extends AppCompatActivity {
                                                     @Override
                                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
 //                                                                                    int max= Integer.parseInt(snapshot.child("batchMaxStrength").getValue().toString());
-                                                        int curr= Integer.parseInt(snapshot.child("batchtot").getValue().toString());
-                                                        curr+=1;
+                                                        int curr = Integer.parseInt(snapshot.child("batchtot").getValue().toString());
+                                                        curr += 1;
                                                         snapshot.getRef().child("batchtot").setValue(curr);
                                                         Toast.makeText(AdmissionActivity.this, "Member Added", Toast.LENGTH_SHORT).show();
-                                                        Intent i=new Intent(AdmissionActivity.this, MainActivity.class);
+                                                        Intent i = new Intent(AdmissionActivity.this, MainActivity.class);
                                                         startActivity(i);
                                                         finish();
                                                         loadingDialog.dismiss();
@@ -353,7 +353,7 @@ public class AdmissionActivity extends AppCompatActivity {
 
                                                     @Override
                                                     public void onCancelled(@NonNull DatabaseError error) {
-loadingDialog.dismiss();
+                                                        loadingDialog.dismiss();
                                                     }
                                                 });
 
@@ -366,19 +366,18 @@ loadingDialog.dismiss();
         });
     }
 
-    private void uploadImage(Member m)
-    {
+    private void uploadImage(@NonNull Member m) {
         if (uripro != null) {
             // Defining the child of storageReference
             StorageReference ref
                     = storageReference
                     .child(
-                            "/"+FirebaseAuth.getInstance().getCurrentUser().getUid()+"/propics/"
+                            "/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/propics/"
                                     + m.getId());
             StorageReference ref1
                     = storageReference
                     .child(
-                            "/"+FirebaseAuth.getInstance().getCurrentUser().getUid()+"/docpics/"
+                            "/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/docpics/"
                                     + m.getId());
 
 
@@ -403,13 +402,12 @@ loadingDialog.dismiss();
 
                                 @Override
                                 public void onSuccess(
-                                        UploadTask.TaskSnapshot taskSnapshot)
-                                {
-                                             Toast.makeText(AdmissionActivity.this,
+                                        UploadTask.TaskSnapshot taskSnapshot) {
+                                    Toast.makeText(AdmissionActivity.this,
                                             "Image Uploaded!!",
                                             Toast.LENGTH_SHORT).show();
 
-                                    if(uridoc != null){
+                                    if (uridoc != null) {
 
                                         Bitmap bmp = null;
                                         try {
@@ -428,16 +426,15 @@ loadingDialog.dismiss();
                                                         new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                                             @Override
                                                             public void onSuccess(
-                                                                    UploadTask.TaskSnapshot taskSnapshot)
-                                                            {
+                                                                    UploadTask.TaskSnapshot taskSnapshot) {
 
                                                                 ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                                                     @Override
-                                                                    public void onSuccess(Uri uri) {
+                                                                    public void onSuccess(@NonNull Uri uri) {
                                                                         m.setPicurl(uri.toString());
                                                                         ref1.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                                                             @Override
-                                                                            public void onSuccess(Uri uri) {
+                                                                            public void onSuccess(@NonNull Uri uri) {
                                                                                 m.setDocurl(uri.toString());
                                                                                 uploadData(m);
                                                                                 loadingDialog.dismiss();
@@ -449,8 +446,7 @@ loadingDialog.dismiss();
                                                         })
                                                 .addOnFailureListener(new OnFailureListener() {
                                                     @Override
-                                                    public void onFailure(@NonNull Exception e)
-                                                    {
+                                                    public void onFailure(@NonNull Exception e) {
 
                                                         // Error, Image not uploaded
                                                         Toast.makeText(AdmissionActivity.this,
@@ -459,11 +455,12 @@ loadingDialog.dismiss();
                                                         loadingDialog.dismiss();
                                                     }
                                                 });
-                                    }else{
+                                    } else {
                                         ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                             @Override
-                                            public void onSuccess(Uri uri) {
-                                                m.setPicurl(uri.toString());uploadData(m);
+                                            public void onSuccess(@NonNull Uri uri) {
+                                                m.setPicurl(uri.toString());
+                                                uploadData(m);
                                                 loadingDialog.dismiss();
                                             }
                                         });
@@ -473,8 +470,7 @@ loadingDialog.dismiss();
 
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
-                        public void onFailure(@NonNull Exception e)
-                        {
+                        public void onFailure(@NonNull Exception e) {
 
                             // Error, Image not uploaded
                             Toast
@@ -485,7 +481,7 @@ loadingDialog.dismiss();
                             loadingDialog.dismiss();
                         }
                     });
-        }else {
+        } else {
             m.setPicurl("");
             m.setDocurl("");
             uploadData(m);

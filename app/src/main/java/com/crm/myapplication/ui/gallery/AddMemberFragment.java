@@ -24,29 +24,22 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.crm.myapplication.DataList;
-import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Batch;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.R;
 import com.crm.myapplication.ui.plans.PlansFragment;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -60,10 +53,18 @@ public class AddMemberFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    static Uri uripro, uridoc;
+    private final List<Batch> enableList = DataList.batchList
+            .stream().filter(m -> m.getStatus().equals("enable")).collect(Collectors.toList());
+    private final String[] arr = new String[enableList.size()];
     ImageView propic, docs;
     EditText name, mobile, email, joindate, address, dob, details;
     Button selectImage, submit, selectDoc;
     int i = -1;
+    Batch p;
+    Spinner spin;
+    @Nullable
+    Dialog loadingDialog;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -80,6 +81,7 @@ public class AddMemberFragment extends Fragment {
      * @return A new instance of fragment AddMemberFragment.
      */
     // TODO: Rename and change types and number of parameters
+    @NonNull
     public static AddMemberFragment newInstance(String param1, String param2) {
         AddMemberFragment fragment = new AddMemberFragment();
         Bundle args = new Bundle();
@@ -97,31 +99,22 @@ public class AddMemberFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-    private List<Batch> enableList= DataList.batchList
-        .stream().filter(m -> m.getStatus().equals("enable")).collect(Collectors.toList());
-    Batch p;
-    Spinner spin;
-    private String arr[]=new String[enableList.size()];
-
-
-    static Uri uripro, uridoc;
-
-    Dialog loadingDialog;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add_member, container, false);
-        int k=0;
-        for(Batch b: enableList){
-            if(b.getStatus().equals("enable")) {
-                arr[k] = b.getBatchname(); k++;
+        int k = 0;
+        for (Batch b : enableList) {
+            if (b.getStatus().equals("enable")) {
+                arr[k] = b.getBatchname();
+                k++;
             }
         }
 
 
-        loadingDialog= new Dialog(getContext());
+        loadingDialog = new Dialog(getContext());
         loadingDialog.setContentView(R.layout.loading);
         loadingDialog.getWindow().setBackgroundDrawable(getContext().getDrawable(R.drawable.rounded_corners));
         loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -135,7 +128,7 @@ public class AddMemberFragment extends Fragment {
         details = ((EditText) view.findViewById(R.id.editTextTextMultiLine));
         RadioButton male = (RadioButton) view.findViewById(R.id.radioButton);
         RadioButton female = (RadioButton) view.findViewById(R.id.radioButton2);
-        spin= view.findViewById(R.id.spinner);
+        spin = view.findViewById(R.id.spinner);
 
         dob = ((EditText) view.findViewById(R.id.editTextDate2));
         propic = view.findViewById(R.id.imageView);
@@ -156,7 +149,7 @@ public class AddMemberFragment extends Fragment {
                 builder1.setPositiveButton(
                         "Camera",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+                            public void onClick(@NonNull DialogInterface dialog, int id) {
                                 i = 0;
                                 Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                                 startActivityForResult(takePicture, 0);
@@ -167,7 +160,7 @@ public class AddMemberFragment extends Fragment {
                 builder1.setNegativeButton(
                         "Gallery",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+                            public void onClick(@NonNull DialogInterface dialog, int id) {
                                 i = 1;
                                 imageChooser();
                                 dialog.cancel();
@@ -176,7 +169,7 @@ public class AddMemberFragment extends Fragment {
 
                 builder1.setNeutralButton("Close", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int i) {
+                    public void onClick(@NonNull DialogInterface dialog, int i) {
                         dialog.cancel();
                     }
                 });
@@ -197,7 +190,7 @@ public class AddMemberFragment extends Fragment {
                 builder1.setPositiveButton(
                         "Camera",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+                            public void onClick(@NonNull DialogInterface dialog, int id) {
                                 i = 2;
                                 Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                                 startActivityForResult(takePicture, 2);
@@ -208,7 +201,7 @@ public class AddMemberFragment extends Fragment {
                 builder1.setNegativeButton(
                         "Gallery",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+                            public void onClick(@NonNull DialogInterface dialog, int id) {
                                 i = 3;
                                 imageChooser();
                                 dialog.cancel();
@@ -217,7 +210,7 @@ public class AddMemberFragment extends Fragment {
 
                 builder1.setNeutralButton("Close", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int i) {
+                    public void onClick(@NonNull DialogInterface dialog, int i) {
                         dialog.cancel();
                     }
                 });
@@ -238,7 +231,7 @@ public class AddMemberFragment extends Fragment {
                 } else if (female.isChecked()) {
                     gender = "Female";
                 }
-                if(p != null) {
+                if (p != null) {
                     if (gender.equals("Male") || gender.equals("Female")) {
                         if (!((name.getText().toString()).equals("")) &&
                                 !((mobile.getText().toString()).equals("")) && mobile.length() == 10) {
@@ -255,7 +248,7 @@ public class AddMemberFragment extends Fragment {
                                         builder1.setPositiveButton(
                                                 "Yes",
                                                 new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int id) {
+                                                    public void onClick(@NonNull DialogInterface dialog, int id) {
 //2 - specified pattern
                                                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -264,13 +257,13 @@ public class AddMemberFragment extends Fragment {
                                                                 "", "",
                                                                 (joindate.getText().toString()).equals("") ? ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toString() :
                                                                         (LocalDate.parse(joindate.getText().toString().trim(), formatter)
-                                                                        .atStartOfDay(ZoneId.systemDefault())).toString(),
+                                                                                .atStartOfDay(ZoneId.systemDefault())).toString(),
                                                                 "", "", mobile.getText().toString(),
                                                                 email.getText().toString(),
                                                                 address.getText().toString(),
                                                                 finalGender,
-                                                                (dob.getText().toString().equals("")?
-                                                                        "":
+                                                                (dob.getText().toString().equals("") ?
+                                                                        "" :
                                                                         (LocalDate.parse(dob.getText().toString().trim(), formatter)
                                                                                 .atStartOfDay(ZoneId.systemDefault())).toString()),
                                                                 details.getText().toString(),
@@ -281,10 +274,10 @@ public class AddMemberFragment extends Fragment {
                                                         PlansFragment.loadPlanData();
                                                         Intent i = new Intent(getContext(), AdmissionActivity.class);
                                                         i.putExtra("member", m);
-                                                        if(uridoc != null)
-                                                        i.putExtra("uridoc", uridoc.toString());
-                                                        if(uripro != null)
-                                                        i.putExtra("uripro", uripro.toString());
+                                                        if (uridoc != null)
+                                                            i.putExtra("uridoc", uridoc.toString());
+                                                        if (uripro != null)
+                                                            i.putExtra("uripro", uripro.toString());
                                                         startActivity(i);
                                                         dialog.cancel();
                                                     }
@@ -293,7 +286,7 @@ public class AddMemberFragment extends Fragment {
                                         builder1.setNegativeButton(
                                                 "No",
                                                 new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int id) {
+                                                    public void onClick(@NonNull DialogInterface dialog, int id) {
                                                         dialog.cancel();
                                                     }
                                                 });
@@ -315,7 +308,7 @@ public class AddMemberFragment extends Fragment {
                     } else {
                         Toast.makeText(getContext(), "Invalid Gender", Toast.LENGTH_SHORT).show();
                     }
-                }else{
+                } else {
                     Toast.makeText(getContext(), "Please select a batch", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -330,7 +323,7 @@ public class AddMemberFragment extends Fragment {
                         arr[i],
                         Toast.LENGTH_LONG)
                         .show();
-                p= enableList.get(i);
+                p = enableList.get(i);
             }
 
             @Override
@@ -365,7 +358,7 @@ public class AddMemberFragment extends Fragment {
 
     // this function is triggered when user
     // selects the image from the imageChooser
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (i) {
             case 0:
@@ -374,7 +367,7 @@ public class AddMemberFragment extends Fragment {
                     // SELECT_PICTURE constant
                     if (requestCode == 0) {
                         // Get the url of the image from data
-                        uripro= data.getData();
+                        uripro = data.getData();
                         Bitmap photo = (Bitmap) data.getExtras().get("data");
                         propic.setImageBitmap(photo);
 
@@ -402,7 +395,7 @@ public class AddMemberFragment extends Fragment {
                     if (requestCode == 2) {
                         // Get the url of the image from data
                         Bitmap photo = (Bitmap) data.getExtras().get("data");
-                        uridoc= data.getData();
+                        uridoc = data.getData();
                         docs.setImageBitmap(photo);
                     }
                 }
@@ -426,7 +419,7 @@ public class AddMemberFragment extends Fragment {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public boolean verifyDate(String date) {
+    public boolean verifyDate(@NonNull String date) {
         if (date.length() == 10 && date.charAt(2) == '/'
                 && date.charAt(5) == '/') {
             int dd = Integer.parseInt(date.substring(0, 2));

@@ -23,8 +23,8 @@ import java.util.List;
 
 public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.MyViewHolder> {
 
-    private Context mContext;
-    private List<Batch> mData ;
+    private final Context mContext;
+    private final List<Batch> mData;
 
     public BatchAdapter(Context mContext, List<Batch> mData) {
         this.mContext = mContext;
@@ -41,12 +41,12 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.MyViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        String batch=  mData.get(position).getBatchname();
-        String id=   mData.get(position).getBatchid();
-        String batchTot=  mData.get(position).getBatchtot();
-        String batchStrength=   mData.get(position).getBatchMaxStrength();
-        String batchdesc=   mData.get(position).getBatchdesc();
-        String batchStatus= mData.get(position).getStatus();
+        String batch = mData.get(position).getBatchname();
+        String id = mData.get(position).getBatchid();
+        String batchTot = mData.get(position).getBatchtot();
+        String batchStrength = mData.get(position).getBatchMaxStrength();
+        String batchdesc = mData.get(position).getBatchdesc();
+        String batchStatus = mData.get(position).getStatus();
 
         holder.setData(batch, id, batchTot, batchStrength, batchdesc, batchStatus, position);
 
@@ -59,37 +59,38 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.MyViewHolder
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
+        private final Button deleteBtn;
+        private final Button statusBtn;
         TextView planname, fee, duration, desc, status;
-        private Button deleteBtn, statusBtn;
 
-        public MyViewHolder(View itemView) {
+        public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             planname = itemView.findViewById(R.id.textView6);
             fee = itemView.findViewById(R.id.textView8);
             duration = itemView.findViewById(R.id.textView10);
             desc = itemView.findViewById(R.id.textView12);
-            statusBtn= itemView.findViewById(R.id.button3);
+            statusBtn = itemView.findViewById(R.id.button3);
             deleteBtn = itemView.findViewById(R.id.button14);
-            status= itemView.findViewById(R.id.textView33);
+            status = itemView.findViewById(R.id.textView33);
 
         }
 
-        public void setData(String batch, String id, String batchTot, String batchStrength, String batchdesc, String batchStatus, int position) {
+        public void setData(String batch, @NonNull String id, String batchTot, String batchStrength, String batchdesc, @NonNull String batchStatus, int position) {
             this.planname.setText(batch);
             this.fee.setText(batchTot);
-            this.duration.setText(batchTot+" / "+batchStrength);
+            this.duration.setText(batchTot + " / " + batchStrength);
             this.desc.setText(batchdesc);
-            if(batchStatus.equals("enable")){
+            if (batchStatus.equals("enable")) {
                 this.status.setText("ACTIVE");
                 this.status.setBackgroundColor(Color.parseColor("#26580f"));
-            }else if( batchStatus.equals("disable")){
+            } else if (batchStatus.equals("disable")) {
                 this.status.setText("DISABLED");
                 this.status.setBackgroundColor(Color.parseColor("#ff0000"));
             }
 
-            if(batchStatus.equals("enable")){
+            if (batchStatus.equals("enable")) {
                 statusBtn.setText("DISABLE");
-            }else if( batchStatus.equals("disable")){
+            } else if (batchStatus.equals("disable")) {
                 statusBtn.setText("ENABLE");
             }
 
@@ -103,7 +104,7 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.MyViewHolder
                             "Yes",
                             new DialogInterface.OnClickListener() {
                                 @RequiresApi(api = Build.VERSION_CODES.O)
-                                public void onClick(DialogInterface dialog, int mid) {
+                                public void onClick(@NonNull DialogInterface dialog, int mid) {
                                     BatchFragment.changeStatus(id, batchStatus);
                                     dialog.cancel();
                                 }
@@ -111,7 +112,7 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.MyViewHolder
                     builder1.setNegativeButton(
                             "No",
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
+                                public void onClick(@NonNull DialogInterface dialog, int id) {
                                     dialog.cancel();
                                 }
                             });
@@ -131,7 +132,7 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.MyViewHolder
                             "Yes",
                             new DialogInterface.OnClickListener() {
                                 @RequiresApi(api = Build.VERSION_CODES.O)
-                                public void onClick(DialogInterface dialog, int mid) {
+                                public void onClick(@NonNull DialogInterface dialog, int mid) {
                                     BatchFragment.deletePlan(id, position, mContext);
                                     dialog.cancel();
                                 }
@@ -139,7 +140,7 @@ public class BatchAdapter extends RecyclerView.Adapter<BatchAdapter.MyViewHolder
                     builder1.setNegativeButton(
                             "No",
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
+                                public void onClick(@NonNull DialogInterface dialog, int id) {
                                     dialog.cancel();
                                 }
                             });

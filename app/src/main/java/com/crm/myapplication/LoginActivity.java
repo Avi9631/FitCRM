@@ -29,27 +29,26 @@ import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
+    FirebaseAuth mAuth;
     private LinearLayout l1, l2;
     private EditText email, pass;
     private Button btn1, btn2;
     private TextView forgotPass;
-    FirebaseAuth mAuth;
-
     private Dialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        mAuth= FirebaseAuth.getInstance();
-        l1= findViewById(R.id.loginlinlay);
-        email= findViewById(R.id.email);
-        pass= findViewById(R.id.pass);
-        btn1= findViewById(R.id.btn1);
-        btn2= findViewById(R.id.btn2);
-        forgotPass= findViewById(R.id.textView24);
+        mAuth = FirebaseAuth.getInstance();
+        l1 = findViewById(R.id.loginlinlay);
+        email = findViewById(R.id.email);
+        pass = findViewById(R.id.pass);
+        btn1 = findViewById(R.id.btn1);
+        btn2 = findViewById(R.id.btn2);
+        forgotPass = findViewById(R.id.textView24);
 
-        loadingDialog= new Dialog(LoginActivity.this);
+        loadingDialog = new Dialog(LoginActivity.this);
         loadingDialog.setContentView(R.layout.loading);
         loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
         loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -58,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
         forgotPass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!email.getText().toString().trim().equals("")) {
+                if (!email.getText().toString().trim().equals("")) {
                     loadingDialog.show();
                     FirebaseAuth.getInstance().sendPasswordResetEmail(email.getText().toString())
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -73,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
                                         builder1.setPositiveButton(
                                                 "OK",
                                                 new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int id) {
+                                                    public void onClick(@NonNull DialogInterface dialog, int id) {
 
                                                         dialog.cancel();
                                                     }
@@ -81,13 +80,13 @@ public class LoginActivity extends AppCompatActivity {
 
                                         AlertDialog alert11 = builder1.create();
                                         alert11.show();
-                                    }else{
+                                    } else {
                                         loadingDialog.dismiss();
                                         Toast.makeText(LoginActivity.this, "Email not registered", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
-                }else{
+                } else {
                     loadingDialog.dismiss();
                     Toast.makeText(LoginActivity.this, "Please input your email to reset the password", Toast.LENGTH_SHORT).show();
                 }
@@ -98,10 +97,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!TextUtils.isEmpty(email.getText().toString())) {
-                    if(!TextUtils.isEmpty(pass.getText().toString())){
+                    if (!TextUtils.isEmpty(pass.getText().toString())) {
 //                        checkLogin(email.getText().toString(), pass.getText().toString());
                         login();
-                    }else{
+                    } else {
                         Toast.makeText(LoginActivity.this, "Please enter a valid password.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
@@ -113,20 +112,20 @@ public class LoginActivity extends AppCompatActivity {
         btn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i=new Intent(LoginActivity.this, RegisterActivity.class);
+                Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(i);
             }
         });
     }
 
-    public void login(){
+    public void login() {
         loadingDialog.show();
         mAuth.signInWithEmailAndPassword(email.getText().toString().trim(), pass.getText().toString().trim())
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()){
-                            Intent i=new Intent(LoginActivity.this, MainActivity.class);
+                        if (task.isSuccessful()) {
+                            Intent i = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(i);
                             finish();
                             loadingDialog.dismiss();
@@ -141,16 +140,16 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(FirebaseAuth.getInstance().getCurrentUser()!=null){
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             loadFromDB();
         }
     }
 
-    public void loadFromDB(){
-        if(com.crm.myapplication.DataList.batchList.size()>0){
+    public void loadFromDB() {
+        if (com.crm.myapplication.DataList.batchList.size() > 0) {
             com.crm.myapplication.DataList.batchList.clear();
         }
-        if(com.crm.myapplication.DataList.planList.size()>0){
+        if (com.crm.myapplication.DataList.planList.size() > 0) {
             com.crm.myapplication.DataList.planList.clear();
         }
         loadingDialog.show();
@@ -162,7 +161,7 @@ public class LoginActivity extends AppCompatActivity {
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for(DataSnapshot d: snapshot.getChildren()){
+                        for (DataSnapshot d : snapshot.getChildren()) {
                             com.crm.myapplication.DataList.batchList.add(new Batch(
                                     String.valueOf(d.child("batchid").getValue()),
                                     String.valueOf(d.child("batchname").getValue()),
@@ -183,7 +182,7 @@ public class LoginActivity extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                                        for(DataSnapshot d: snapshot.getChildren()){
+                                        for (DataSnapshot d : snapshot.getChildren()) {
                                             com.crm.myapplication.DataList.planList.add(new Plan(
                                                     String.valueOf(d.child("planid").getValue()),
                                                     String.valueOf(d.child("planname").getValue()),
@@ -196,20 +195,21 @@ public class LoginActivity extends AppCompatActivity {
                                             ));
                                         }
                                         Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                                        startActivity(i);finish();
-loadingDialog.dismiss();
+                                        startActivity(i);
+                                        finish();
+                                        loadingDialog.dismiss();
                                     }
 
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error) {
-loadingDialog.dismiss();
+                                        loadingDialog.dismiss();
                                     }
                                 });
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-loadingDialog.dismiss();
+                        loadingDialog.dismiss();
                     }
                 });
     }

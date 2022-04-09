@@ -9,13 +9,13 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.crm.myapplication.Adapters.PlanAdapter;
 import com.crm.myapplication.DataList;
-import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Plan;
 import com.crm.myapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -38,11 +38,15 @@ public class PlansFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    @Nullable
+    static Dialog loadingDialog;
+    @Nullable
+    private static PlanAdapter memberAdapter;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
+    private FloatingActionButton floatingActionButton;
+    private RecyclerView view;
     public PlansFragment() {
         // Required empty public constructor
     }
@@ -56,6 +60,7 @@ public class PlansFragment extends Fragment {
      * @return A new instance of fragment PlansFragment.
      */
     // TODO: Rename and change types and number of parameters
+    @NonNull
     public static PlansFragment newInstance(String param1, String param2) {
         PlansFragment fragment = new PlansFragment();
         Bundle args = new Bundle();
@@ -65,92 +70,8 @@ public class PlansFragment extends Fragment {
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    private FloatingActionButton floatingActionButton;
-    private RecyclerView view;
-    private static PlanAdapter memberAdapter;
-
-    static Dialog loadingDialog;
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View v= inflater.inflate(R.layout.fragment_plans, container, false);
-        view= v.findViewById(R.id.planrec);
-        floatingActionButton= v.findViewById(R.id.floatingActionButton);
-
-        loadingDialog= new Dialog(getContext());
-        loadingDialog.setContentView(R.layout.loading);
-        loadingDialog.getWindow().setBackgroundDrawable(getContext().getDrawable(R.drawable.rounded_corners));
-        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        loadingDialog.setCancelable(false);
-
-        LinearLayoutManager l= new LinearLayoutManager(getContext());
-        l.setOrientation(RecyclerView.VERTICAL);
-        view.setLayoutManager(l);
-        view.setHasFixedSize(true);
-        view.setNestedScrollingEnabled(false);
-
-        if(DataList.planList.size()>0){
-            DataList.planList.clear();
-        }
-
-        loadingDialog.show();
-        FirebaseDatabase.getInstance().getReference()
-                .child("FITCRM")
-                .child("gyms")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("plans")
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for(DataSnapshot d: snapshot.getChildren()){
-                            DataList.planList.add(new Plan(
-                                    String.valueOf(d.child("planid").getValue()),
-                                    String.valueOf(d.child("planname").getValue()),
-                                    String.valueOf(d.child("planfee").getValue()),
-                                    String.valueOf(d.child("planduration").getValue()),
-                                    String.valueOf(d.child("plandurationtype").getValue()),
-                                    String.valueOf(d.child("plandesc").getValue()),
-                                    String.valueOf(d.child("status").getValue()),
-                                    String.valueOf(d.child("planTimestamp").getValue())
-                            ));
-                        }
-                        memberAdapter = new PlanAdapter(getContext(), DataList.planList );
-                        view.setAdapter(memberAdapter);
-                        memberAdapter.notifyDataSetChanged();
-                        loadingDialog.dismiss();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-loadingDialog.dismiss();
-                    }
-                });
-
-
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i=new Intent(getContext(), PlanActivity.class);
-                startActivity(i);
-            }
-        });
-
-        return v;
-    }
-
-    public static void changeStatus(String id, String status){
-        if(status.equals("enable")) {
+    public static void changeStatus(@NonNull String id, @NonNull String status) {
+        if (status.equals("enable")) {
             loadingDialog.show();
             FirebaseDatabase.getInstance().getReference()
                     .child("FITCRM")
@@ -162,14 +83,14 @@ loadingDialog.dismiss();
                     .setValue("disable").addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         loadPlanData();
                     }
                     loadingDialog.dismiss();
                 }
             });
 
-        }else{
+        } else {
             loadingDialog.show();
             FirebaseDatabase.getInstance().getReference()
                     .child("FITCRM")
@@ -181,7 +102,7 @@ loadingDialog.dismiss();
                     .setValue("enable").addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         loadPlanData();
                     }
                     loadingDialog.dismiss();
@@ -191,8 +112,8 @@ loadingDialog.dismiss();
 
     }
 
-    public static void loadPlanData(){
-        if(DataList.planList.size()>0){
+    public static void loadPlanData() {
+        if (DataList.planList.size() > 0) {
             DataList.planList.clear();
         }
         loadingDialog.show();
@@ -204,7 +125,7 @@ loadingDialog.dismiss();
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for(DataSnapshot d: snapshot.getChildren()){
+                        for (DataSnapshot d : snapshot.getChildren()) {
                             DataList.planList.add(new Plan(
                                     String.valueOf(d.child("planid").getValue()),
                                     String.valueOf(d.child("planname").getValue()),
@@ -222,9 +143,87 @@ loadingDialog.dismiss();
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-loadingDialog.dismiss();
+                        loadingDialog.dismiss();
                     }
                 });
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View v = inflater.inflate(R.layout.fragment_plans, container, false);
+        view = v.findViewById(R.id.planrec);
+        floatingActionButton = v.findViewById(R.id.floatingActionButton);
+
+        loadingDialog = new Dialog(getContext());
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getContext().getDrawable(R.drawable.rounded_corners));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
+
+        LinearLayoutManager l = new LinearLayoutManager(getContext());
+        l.setOrientation(RecyclerView.VERTICAL);
+        view.setLayoutManager(l);
+        view.setHasFixedSize(true);
+        view.setNestedScrollingEnabled(false);
+
+        if (DataList.planList.size() > 0) {
+            DataList.planList.clear();
+        }
+
+        loadingDialog.show();
+        FirebaseDatabase.getInstance().getReference()
+                .child("FITCRM")
+                .child("gyms")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("plans")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot d : snapshot.getChildren()) {
+                            DataList.planList.add(new Plan(
+                                    String.valueOf(d.child("planid").getValue()),
+                                    String.valueOf(d.child("planname").getValue()),
+                                    String.valueOf(d.child("planfee").getValue()),
+                                    String.valueOf(d.child("planduration").getValue()),
+                                    String.valueOf(d.child("plandurationtype").getValue()),
+                                    String.valueOf(d.child("plandesc").getValue()),
+                                    String.valueOf(d.child("status").getValue()),
+                                    String.valueOf(d.child("planTimestamp").getValue())
+                            ));
+                        }
+                        memberAdapter = new PlanAdapter(getContext(), DataList.planList);
+                        view.setAdapter(memberAdapter);
+                        memberAdapter.notifyDataSetChanged();
+                        loadingDialog.dismiss();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        loadingDialog.dismiss();
+                    }
+                });
+
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getContext(), PlanActivity.class);
+                startActivity(i);
+            }
+        });
+
+        return v;
     }
 
 //    public  static  void deletePlan(int pos){

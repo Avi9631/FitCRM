@@ -1,5 +1,13 @@
 package com.crm.myapplication;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -10,12 +18,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Build;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import com.crm.myapplication.ui.batch.BatchFragment;
 import com.crm.myapplication.ui.gallery.AddMemberFragment;
 import com.crm.myapplication.ui.gymprofile.ProfileFragment;
@@ -39,7 +41,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -81,6 +82,31 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+            builder1.setMessage("You want to Log out?");
+            builder1.setCancelable(true);
+            builder1.setPositiveButton(
+                    "Yes",
+                    new DialogInterface.OnClickListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.O)
+                        public void onClick(@NonNull DialogInterface dialog, int mid) {
+                            FirebaseAuth.getInstance().signOut();
+                            Intent i = new Intent(MainActivity.this, LoginActivity.class);
+                            startActivity(i);
+                            finish();
+                            dialog.cancel();
+                        }
+                    });
+            builder1.setNegativeButton(
+                    "No",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(@NonNull DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alert11 = builder1.create();
+            alert11.show();
             return true;
         }
 
@@ -124,9 +150,9 @@ public class MainActivity extends AppCompatActivity
                         "Yes",
                         new DialogInterface.OnClickListener() {
                             @RequiresApi(api = Build.VERSION_CODES.O)
-                            public void onClick(DialogInterface dialog, int mid) {
+                            public void onClick(@NonNull DialogInterface dialog, int mid) {
                                 FirebaseAuth.getInstance().signOut();
-                                Intent i= new Intent(MainActivity.this, LoginActivity.class);
+                                Intent i = new Intent(MainActivity.this, LoginActivity.class);
                                 startActivity(i);
                                 finish();
                                 dialog.cancel();
@@ -135,7 +161,7 @@ public class MainActivity extends AppCompatActivity
                 builder1.setNegativeButton(
                         "No",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+                            public void onClick(@NonNull DialogInterface dialog, int id) {
                                 dialog.cancel();
                             }
                         });
@@ -161,7 +187,7 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
         //calling the method displayselectedscreen and passing the id of selected menu
         displaySelectedScreen(item.getItemId());

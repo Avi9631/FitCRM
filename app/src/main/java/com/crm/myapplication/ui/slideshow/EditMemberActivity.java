@@ -26,30 +26,26 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.crm.myapplication.DataList;
-import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.Models.Batch;
 import com.crm.myapplication.Models.Member;
 import com.crm.myapplication.R;
-import com.crm.myapplication.ui.gallery.AdmissionActivity;
-import com.crm.myapplication.ui.plans.PlansFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class EditMemberActivity extends AppCompatActivity {
 
+    private final String[] arr = new String[(int) DataList.batchList
+            .stream().filter(m -> m.getStatus().equals("enable")).count()];
     ImageView propic, docs;
     EditText name, mobile, email, joindate, address, dob, details;
     Button selectImage, submit, selectDoc;
     int i = -1;
-    private String arr[]=new String[(int) DataList.batchList
-            .stream().filter(m -> m.getStatus().equals("enable")).count()];
     Batch p;
     Spinner spin;
 
@@ -65,14 +61,15 @@ public class EditMemberActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle("Edit Member");
 
-        int k=0;
-        for(Batch b: DataList.batchList){
-            if(b.getStatus().equals("enable")) {
-                arr[k] = b.getBatchname(); k++;
+        int k = 0;
+        for (Batch b : DataList.batchList) {
+            if (b.getStatus().equals("enable")) {
+                arr[k] = b.getBatchname();
+                k++;
             }
         }
 
-        loadingDialog= new Dialog(EditMemberActivity.this);
+        loadingDialog = new Dialog(EditMemberActivity.this);
         loadingDialog.setContentView(R.layout.loading);
         loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
         loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -91,7 +88,7 @@ public class EditMemberActivity extends AppCompatActivity {
         details = ((EditText) findViewById(R.id.editTextTextMultiLine));
         RadioButton male = (RadioButton) findViewById(R.id.radioButton);
         RadioButton female = (RadioButton) findViewById(R.id.radioButton2);
-        spin= findViewById(R.id.spinner);
+        spin = findViewById(R.id.spinner);
 
 
         dob = ((EditText) findViewById(R.id.editTextDate2));
@@ -106,25 +103,25 @@ public class EditMemberActivity extends AppCompatActivity {
         mobile.setText(m.getMob());
         email.setText(m.getEmail());
 
-        ZonedDateTime l= ZonedDateTime.parse(m.getJoindate());
-        DateTimeFormatter ft= DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        joindate.setText(ft.format(l).toString());
+        ZonedDateTime l = ZonedDateTime.parse(m.getJoindate());
+        DateTimeFormatter ft = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        joindate.setText(ft.format(l));
         joindate.setEnabled(false);
 
         address.setText(m.getAddress());
         details.setText(m.getDetails());
-        if(m.getGender().equals("Male")){
+        if (m.getGender().equals("Male")) {
             male.setChecked(true);
-        }else if(m.getGender().equals("Female")){
+        } else if (m.getGender().equals("Female")) {
             female.setChecked(true);
         }
         dob.setEnabled(false);
 
-        if(!m.getDob().trim().equals("")) {
+        if (!m.getDob().trim().equals("")) {
             ZonedDateTime l1 = ZonedDateTime.parse(m.getDob());
             DateTimeFormatter ft1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            dob.setText(ft1.format(l1).toString());
-        }else{
+            dob.setText(ft1.format(l1));
+        } else {
             dob.setText(m.getDob());
         }
 
@@ -139,7 +136,7 @@ public class EditMemberActivity extends AppCompatActivity {
                 builder1.setPositiveButton(
                         "Camera",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+                            public void onClick(@NonNull DialogInterface dialog, int id) {
                                 i = 0;
                                 Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                                 startActivityForResult(takePicture, 0);
@@ -150,7 +147,7 @@ public class EditMemberActivity extends AppCompatActivity {
                 builder1.setNegativeButton(
                         "Gallery",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+                            public void onClick(@NonNull DialogInterface dialog, int id) {
                                 i = 1;
                                 imageChooser();
                                 dialog.cancel();
@@ -159,7 +156,7 @@ public class EditMemberActivity extends AppCompatActivity {
 
                 builder1.setNeutralButton("Close", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int i) {
+                    public void onClick(@NonNull DialogInterface dialog, int i) {
                         dialog.cancel();
                     }
                 });
@@ -180,7 +177,7 @@ public class EditMemberActivity extends AppCompatActivity {
                 builder1.setPositiveButton(
                         "Camera",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+                            public void onClick(@NonNull DialogInterface dialog, int id) {
                                 i = 2;
                                 Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                                 startActivityForResult(takePicture, 2);
@@ -191,7 +188,7 @@ public class EditMemberActivity extends AppCompatActivity {
                 builder1.setNegativeButton(
                         "Gallery",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+                            public void onClick(@NonNull DialogInterface dialog, int id) {
                                 i = 3;
                                 imageChooser();
                                 dialog.cancel();
@@ -200,7 +197,7 @@ public class EditMemberActivity extends AppCompatActivity {
 
                 builder1.setNeutralButton("Close", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int i) {
+                    public void onClick(@NonNull DialogInterface dialog, int i) {
                         dialog.cancel();
                     }
                 });
@@ -219,7 +216,7 @@ public class EditMemberActivity extends AppCompatActivity {
                         arr[i],
                         Toast.LENGTH_LONG)
                         .show();
-                p= DataList.batchList.get(i);
+                p = DataList.batchList.get(i);
             }
 
             @Override
@@ -248,7 +245,7 @@ public class EditMemberActivity extends AppCompatActivity {
                 } else if (female.isChecked()) {
                     gender = "Female";
                 }
-                if(p != null) {
+                if (p != null) {
                     if (gender.equals("Male") || gender.equals("Female")) {
                         if (!((name.getText().toString()).equals("")) &&
                                 !((mobile.getText().toString()).equals("")) && mobile.length() == 10) {
@@ -265,8 +262,8 @@ public class EditMemberActivity extends AppCompatActivity {
                                         builder1.setPositiveButton(
                                                 "Yes",
                                                 new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int id) {
-                                                        Member mem= new Member(name.getText().toString(),
+                                                    public void onClick(@NonNull DialogInterface dialog, int id) {
+                                                        Member mem = new Member(name.getText().toString(),
                                                                 m.getId(),
                                                                 m.getPicurl(),
                                                                 m.getDocurl(),
@@ -279,8 +276,8 @@ public class EditMemberActivity extends AppCompatActivity {
                                                                 finalGender, dob.getText().toString(),
                                                                 details.getText().toString(),
                                                                 m.getStatus(),
-                                                                ((p==null)?"":p.getBatchid()),
-                                                                ((p==null)?"":p.getBatchname()));
+                                                                ((p == null) ? "" : p.getBatchid()),
+                                                                ((p == null) ? "" : p.getBatchname()));
 
                                                         loadingDialog.show();
                                                         FirebaseDatabase.getInstance().getReference()
@@ -304,7 +301,7 @@ public class EditMemberActivity extends AppCompatActivity {
                                         builder1.setNegativeButton(
                                                 "No",
                                                 new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int id) {
+                                                    public void onClick(@NonNull DialogInterface dialog, int id) {
                                                         dialog.cancel();
                                                     }
                                                 });
@@ -326,14 +323,13 @@ public class EditMemberActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(EditMemberActivity.this, "Invalid Gender", Toast.LENGTH_SHORT).show();
                     }
-                }else{
+                } else {
                     Toast.makeText(EditMemberActivity.this, "Please select a batch", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-        
-        
-        
+
+
     }
 
     // this function is triggered when
@@ -353,7 +349,7 @@ public class EditMemberActivity extends AppCompatActivity {
 
     // this function is triggered when user
     // selects the image from the imageChooser
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (i) {
             case 0:
@@ -411,7 +407,7 @@ public class EditMemberActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public boolean verifyDate(String date) {
+    public boolean verifyDate(@NonNull String date) {
         if (date.length() == 10 && date.charAt(2) == '/'
                 && date.charAt(5) == '/') {
             int dd = Integer.parseInt(date.substring(0, 2));

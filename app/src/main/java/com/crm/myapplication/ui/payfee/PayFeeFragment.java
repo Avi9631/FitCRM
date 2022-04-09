@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.crm.myapplication.R;
@@ -39,6 +40,7 @@ public class PayFeeFragment extends Fragment {
      * @return A new instance of fragment PayFeeFragment.
      */
     // TODO: Rename and change types and number of parameters
+    @NonNull
     public static PayFeeFragment newInstance(String param1, String param2) {
         PayFeeFragment fragment = new PayFeeFragment();
         Bundle args = new Bundle();
@@ -58,10 +60,10 @@ public class PayFeeFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v= inflater.inflate(R.layout.fragment_pay_fee, container, false);
+        View v = inflater.inflate(R.layout.fragment_pay_fee, container, false);
 
 
         return v;
