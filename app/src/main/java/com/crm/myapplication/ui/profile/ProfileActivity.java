@@ -3,15 +3,11 @@ package com.crm.myapplication.ui.profile;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -21,30 +17,23 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.crm.myapplication.DataList;
-import com.crm.myapplication.LoginActivity;
 import com.crm.myapplication.MainActivity;
-import com.crm.myapplication.Models.Batch;
-import com.crm.myapplication.Models.Plan;
 import com.crm.myapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    EditText name, mobile, email, address, details;
-    Button  submit;
-    int i = -1;
     public static String gid;
-    String emailregistered="";
+    EditText name, mobile, email, address, details;
+    Button submit;
+    int i = -1;
+    String emailregistered = "";
 
     Dialog loadingDialog;
 
@@ -57,9 +46,9 @@ public class ProfileActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle("GYM Profile");
 
-        emailregistered= getIntent().getStringExtra("email");
+        emailregistered = getIntent().getStringExtra("email");
 
-        loadingDialog= new Dialog(ProfileActivity.this);
+        loadingDialog = new Dialog(ProfileActivity.this);
         loadingDialog.setContentView(R.layout.loading);
         loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
         loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -111,11 +100,11 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
 
-}
+    }
 
     private void saveToDB() {
 
-        Map<String, String> map=new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         map.put("gym_name", name.getText().toString());
         map.put("gym_mobile", mobile.getText().toString());
         map.put("gym_email", email.getText().toString());
@@ -131,11 +120,14 @@ public class ProfileActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
-                            loadFromDB();
+                        if (task.isSuccessful()) {
                             Toast.makeText(ProfileActivity.this, "Profile Updated!", Toast.LENGTH_SHORT).show();
-loadingDialog.dismiss();
-                        }else{
+
+                            Intent i = new Intent(ProfileActivity.this, MainActivity.class);
+                            startActivity(i);
+                            finish();
+                            loadingDialog.dismiss();
+                        } else {
                             Toast.makeText(ProfileActivity.this, "Error Occured!", Toast.LENGTH_SHORT).show();
                             loadingDialog.dismiss();
                         }
@@ -144,68 +136,68 @@ loadingDialog.dismiss();
     }
 
 
-    public  void loadFromDB(){
-        loadingDialog.show();
-        FirebaseDatabase.getInstance().getReference()
-                .child("FITCRM")
-                .child("gyms")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("batch")
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for(DataSnapshot d: snapshot.getChildren()){
-                            DataList.batchList.add(new Batch(
-                                    String.valueOf(d.child("batchid").getValue()),
-                                    String.valueOf(d.child("batchname").getValue()),
-                                    String.valueOf(d.child("batchdesc").getValue()),
-                                    String.valueOf(d.child("batchtot").getValue()),
-                                    String.valueOf(d.child("batchMaxStrength").getValue()),
-                                    String.valueOf(d.child("batchtimestamp").getValue()),
-                                    String.valueOf(d.child("status").getValue())
-                            ));
-                        }
-
-                        FirebaseDatabase.getInstance().getReference()
-                                .child("FITCRM")
-                                .child("gyms")
-                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                .child("plans")
-                                .addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                                        for(DataSnapshot d: snapshot.getChildren()){
-                                            DataList.planList.add(new Plan(
-                                                    String.valueOf(d.child("planid").getValue()),
-                                                    String.valueOf(d.child("planname").getValue()),
-                                                    String.valueOf(d.child("planfee").getValue()),
-                                                    String.valueOf(d.child("planduration").getValue()),
-                                                    String.valueOf(d.child("plandurationtype").getValue()),
-                                                    String.valueOf(d.child("plandesc").getValue()),
-                                                    String.valueOf(d.child("status").getValue()),
-                                                    String.valueOf(d.child("planTimestamp").getValue())
-                                            ));
-                                        }
-                                        Intent i = new Intent(ProfileActivity.this, MainActivity.class);
-                                        startActivity(i);
-                                        finish();
-                                        loadingDialog.dismiss();
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-loadingDialog.dismiss();
-                                    }
-                                });
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-loadingDialog.dismiss();
-                    }
-                });
-    }
+//    public  void loadFromDB(){
+//        loadingDialog.show();
+//        FirebaseDatabase.getInstance().getReference()
+//                .child("FITCRM")
+//                .child("gyms")
+//                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+//                .child("batch")
+//                .addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        for(DataSnapshot d: snapshot.getChildren()){
+//                            DataList.batchList.add(new Batch(
+//                                    String.valueOf(d.child("batchid").getValue()),
+//                                    String.valueOf(d.child("batchname").getValue()),
+//                                    String.valueOf(d.child("batchdesc").getValue()),
+//                                    String.valueOf(d.child("batchtot").getValue()),
+//                                    String.valueOf(d.child("batchMaxStrength").getValue()),
+//                                    String.valueOf(d.child("batchtimestamp").getValue()),
+//                                    String.valueOf(d.child("status").getValue())
+//                            ));
+//                        }
+//
+//                        FirebaseDatabase.getInstance().getReference()
+//                                .child("FITCRM")
+//                                .child("gyms")
+//                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+//                                .child("plans")
+//                                .addValueEventListener(new ValueEventListener() {
+//                                    @Override
+//                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//
+//                                        for(DataSnapshot d: snapshot.getChildren()){
+//                                            DataList.planList.add(new Plan(
+//                                                    String.valueOf(d.child("planid").getValue()),
+//                                                    String.valueOf(d.child("planname").getValue()),
+//                                                    String.valueOf(d.child("planfee").getValue()),
+//                                                    String.valueOf(d.child("planduration").getValue()),
+//                                                    String.valueOf(d.child("plandurationtype").getValue()),
+//                                                    String.valueOf(d.child("plandesc").getValue()),
+//                                                    String.valueOf(d.child("status").getValue()),
+//                                                    String.valueOf(d.child("planTimestamp").getValue())
+//                                            ));
+//                                        }
+//                                        Intent i = new Intent(ProfileActivity.this, MainActivity.class);
+//                                        startActivity(i);
+//                                        finish();
+//                                        loadingDialog.dismiss();
+//
+//                                    }
+//
+//                                    @Override
+//                                    public void onCancelled(@NonNull DatabaseError error) {
+//loadingDialog.dismiss();
+//                                    }
+//                                });
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//loadingDialog.dismiss();
+//                    }
+//                });
+//    }
 
 }

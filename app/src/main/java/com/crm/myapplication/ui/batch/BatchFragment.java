@@ -217,6 +217,7 @@ loadingDialog.dismiss();
                                     String.valueOf(d.child("status").getValue())
                             ));
                         }
+                        memberAdapter.notifyDataSetChanged();
                         loadingDialog.dismiss();
                     }
 

@@ -216,6 +216,7 @@ loadingDialog.dismiss();
                                     String.valueOf(d.child("planTimestamp").getValue())
                             ));
                         }
+                        memberAdapter.notifyDataSetChanged();
                         loadingDialog.dismiss();
                     }
 

@@ -2,6 +2,7 @@ package com.crm.myapplication.Adapters;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,8 +83,10 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.MyViewHolder> 
             this.desc.setText(plandesc);
             if(planStatus.equals("enable")){
                 this.status.setText("ACTIVE");
+                this.status.setBackgroundColor(Color.parseColor("#26580f"));
             }else if( planStatus.equals("disable")){
                 this.status.setText("DISABLED");
+                this.status.setBackgroundColor(Color.parseColor("#ff0000"));
             }
 
             if(planStatus.equals("enable")){

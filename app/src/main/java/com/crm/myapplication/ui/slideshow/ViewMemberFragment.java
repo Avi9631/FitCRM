@@ -85,7 +85,7 @@ public class ViewMemberFragment extends Fragment {
 
 
     RecyclerView view;
-    String[] courses = {"All","Active Members", "Unpaid Members", "Inactive Members", "Expired Members",
+    String[] courses = {"All","Active Members", "Expired Members",
             "Expire Today", "Expire 1-5", "Expire 6-10", "Expire 11-15", "Blocked Members", "Deleted Members"
             };
     private MemberAdapter memberAdapter;

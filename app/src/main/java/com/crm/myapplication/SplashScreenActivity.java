@@ -18,18 +18,18 @@ import com.google.firebase.database.ValueEventListener;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
-    private Dialog loadingDialog;
+//    private Dialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
-        loadingDialog= new Dialog(SplashScreenActivity.this);
-        loadingDialog.setContentView(R.layout.loading);
-        loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
-        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        loadingDialog.setCancelable(false);
+//        loadingDialog= new Dialog(SplashScreenActivity.this);
+//        loadingDialog.setContentView(R.layout.loading);
+//        loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corners));
+//        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+//        loadingDialog.setCancelable(false);
 
         if(FirebaseAuth.getInstance().getCurrentUser()!=null){
             loadFromDB();
@@ -47,7 +47,6 @@ public class SplashScreenActivity extends AppCompatActivity {
         if(DataList.planList.size()>0){
             DataList.planList.clear();
         }
-        loadingDialog.show();
         FirebaseDatabase.getInstance().getReference()
                 .child("FITCRM")
                 .child("gyms")
@@ -91,20 +90,16 @@ public class SplashScreenActivity extends AppCompatActivity {
                                         }
                                         Intent i = new Intent(SplashScreenActivity.this, MainActivity.class);
                                         startActivity(i);finish();
-                                        loadingDialog.dismiss();
-
                                     }
 
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error) {
-loadingDialog.dismiss();
                                     }
                                 });
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-loadingDialog.dismiss();
                     }
                 });
     }
