@@ -271,7 +271,7 @@ public class AddMemberFragment extends Fragment {
                                                                 ((p == null) ? "" : p.getBatchid()),
                                                                 ((p == null) ? "" : p.getBatchname()));
 
-                                                        PlansFragment.loadPlanData();
+                                                        PlansFragment.loadPlanDataNoLoading();
                                                         Intent i = new Intent(getContext(), AdmissionActivity.class);
                                                         i.putExtra("member", m);
                                                         if (uridoc != null)

@@ -148,6 +148,39 @@ public class PlansFragment extends Fragment {
                 });
     }
 
+    public static void loadPlanDataNoLoading() {
+        if (DataList.planList.size() > 0) {
+            DataList.planList.clear();
+        }
+        FirebaseDatabase.getInstance().getReference()
+                .child("FITCRM")
+                .child("gyms")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("plans")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot d : snapshot.getChildren()) {
+                            DataList.planList.add(new Plan(
+                                    String.valueOf(d.child("planid").getValue()),
+                                    String.valueOf(d.child("planname").getValue()),
+                                    String.valueOf(d.child("planfee").getValue()),
+                                    String.valueOf(d.child("planduration").getValue()),
+                                    String.valueOf(d.child("plandurationtype").getValue()),
+                                    String.valueOf(d.child("plandesc").getValue()),
+                                    String.valueOf(d.child("status").getValue()),
+                                    String.valueOf(d.child("planTimestamp").getValue())
+                            ));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+    }
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
